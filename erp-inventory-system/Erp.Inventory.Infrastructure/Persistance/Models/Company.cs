@@ -7,6 +7,9 @@ public class Company
 {
     [Column("id")]
     public int Id { get; set; }
+
+    [Column("cen")]
+    public string Cen { get; set; } = Guid.NewGuid().ToString();
     
     [Column("name")]
     [Required, MaxLength(100)]

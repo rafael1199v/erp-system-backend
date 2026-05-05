@@ -6,6 +6,18 @@ public class Product
 {
     [Column("id")]
     public int Id { get; set; }
+
+    [Column("cen")]
+    public string Cen { get; set; } = Guid.NewGuid().ToString();
+
+    [Column("sku")]
+    public string? Sku { get; set; }
+
+    [Column("description")]
+    public string? Description { get; set; }
+
+    [Column("station_code")]
+    public string? StationCode { get; set; }
     
     [Column("core_product_id")]
     public int CoreProductId { get; set; }
