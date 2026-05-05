@@ -60,7 +60,9 @@ public class UnitRepository(AppDbContext context, ILogger<UnitRepository> logger
         return new Unit
         {
             Id = unit.Id,
+            Cen = string.IsNullOrWhiteSpace(unit.Cen) ? Guid.NewGuid().ToString() : unit.Cen,
             Name = unit.Name,
+            Abbreviation = unit.Abbreviation,
             CompanyId = unit.CompanyId,
         };
     }
@@ -70,7 +72,9 @@ public class UnitRepository(AppDbContext context, ILogger<UnitRepository> logger
         return new UnitEntity
         {
             Id = model.Id,
+            Cen = model.Cen,
             Name = model.Name,
+            Abbreviation = model.Abbreviation,
             CompanyId = model.CompanyId,
         };
     }

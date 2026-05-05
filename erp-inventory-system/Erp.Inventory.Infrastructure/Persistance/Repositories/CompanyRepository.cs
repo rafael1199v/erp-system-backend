@@ -21,6 +21,7 @@ public class CompanyRepository : ICompanyRepository
         return companyModels.Select(company => new CompanyEntity
         {
             Id = company.Id,
+            Cen = company.Cen,
             Name = company.Name,
         }).ToList();
     }

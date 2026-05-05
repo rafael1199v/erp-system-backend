@@ -49,7 +49,9 @@ public class InventoryMovementRepository : IInventoryMovementRepository
         return new InventoryMovement
         {
             Id = inventoryMovementEntity.Id,
+            Cen = string.IsNullOrWhiteSpace(inventoryMovementEntity.Cen) ? Guid.NewGuid().ToString() : inventoryMovementEntity.Cen,
             Title = inventoryMovementEntity.Title,
+            ExternalReference = inventoryMovementEntity.ExternalReference,
             CompanyId = inventoryMovementEntity.CompanyId,
             MovementDate = inventoryMovementEntity.MovementDate,
             MovementTypeId = (int)inventoryMovementEntity.MovementType,
@@ -57,6 +59,7 @@ public class InventoryMovementRepository : IInventoryMovementRepository
             Transactions = inventoryMovementEntity.Transactions.Select(transactionEntity => new Transaction
             {
                 Id = transactionEntity.Id,
+                Cen = string.IsNullOrWhiteSpace(transactionEntity.Cen) ? Guid.NewGuid().ToString() : transactionEntity.Cen,
                 ProductId = transactionEntity.ProductId,
                 WarehouseId = transactionEntity.WarehouseId,
                 Quantity = transactionEntity.Quantity,
@@ -73,7 +76,9 @@ public class InventoryMovementRepository : IInventoryMovementRepository
         return new InventoryMovementEntity
         {
             Id = inventoryMovement.Id,
+            Cen = inventoryMovement.Cen,
             Title = inventoryMovement.Title,
+            ExternalReference = inventoryMovement.ExternalReference,
             CompanyId = inventoryMovement.CompanyId,
             MovementDate = inventoryMovement.MovementDate,
             MovementType = (MovementTypeEnum)inventoryMovement.MovementTypeId,
@@ -81,6 +86,7 @@ public class InventoryMovementRepository : IInventoryMovementRepository
             Transactions = inventoryMovement.Transactions.Select(t => new TransactionEntity
             {
                 Id = t.Id,
+                Cen = t.Cen,
                 Quantity = t.Quantity,
                 Reason = t.Reason ?? "No reason",
                 TransactionDate = t.TransactionDate,

@@ -83,7 +83,8 @@ public class ProductRepository : IProductRepository
     {
         var products = await Queryable
             .Where<Product>(_context.Products
-                .Include(pw => pw.ProductWarehouses), p => productIds.Contains(p.Id) && !p.IsDeleted).ToListAsync();
+                .Include(pw => pw.ProductWarehouses)
+                .ThenInclude(pw => pw.Warehouse), p => productIds.Contains(p.Id) && !p.IsDeleted).ToListAsync();
         
         List<ProductWarehouseStockEntity> productWarehouseStockEntities = new List<ProductWarehouseStockEntity>();
 
@@ -115,6 +116,10 @@ public class ProductRepository : IProductRepository
 
             Product product = new()
             {
+                Cen = ResolveProductCen(productCompanyEntity),
+                Sku = productCompanyEntity.Sku,
+                Description = productCompanyEntity.Description,
+                StationCode = productCompanyEntity.StationCode,
                 CoreProductId = coreProductId,
                 UnitId = productCompanyEntity.UnitId,
                 CompanyId = productCompanyEntity.CompanyId,
@@ -170,6 +175,26 @@ public class ProductRepository : IProductRepository
 
         product.CoreProduct.Name = productCompanyEntity.CoreProduct!.Name;
         product.CoreProduct.ImageUrl = productCompanyEntity.CoreProduct.ImageUrl;
+        if (!string.IsNullOrWhiteSpace(productCompanyEntity.Cen))
+        {
+            product.Cen = productCompanyEntity.Cen;
+        }
+
+        if (!string.IsNullOrWhiteSpace(productCompanyEntity.Sku))
+        {
+            product.Sku = productCompanyEntity.Sku;
+        }
+
+        if (productCompanyEntity.Description is not null)
+        {
+            product.Description = productCompanyEntity.Description;
+        }
+
+        if (productCompanyEntity.StationCode is not null)
+        {
+            product.StationCode = productCompanyEntity.StationCode;
+        }
+
         product.UnitId = productCompanyEntity.UnitId;
         product.CategoryId = productCompanyEntity.CategoryId;
         product.ProductStatusId = productCompanyEntity.ProductStatusId;
@@ -247,6 +272,10 @@ public class ProductRepository : IProductRepository
         return new ProductCompanyEntity
         {
             Id = product.Id,
+            Cen = product.Cen,
+            Sku = product.Sku,
+            Description = product.Description,
+            StationCode = product.StationCode,
             CoreProductId = product.CoreProductId,
             UnitId = product.UnitId,
             CompanyId = product.CompanyId,
@@ -322,20 +351,27 @@ public class ProductRepository : IProductRepository
         return new ProductEntity
         {
             ProductId = productModel.Id,
+            Cen = productModel.Cen,
+            Sku = productModel.Sku,
             ProductName = productModel.CoreProduct.Name,
+            Description = productModel.Description,
+            StationCode = productModel.StationCode,
             Unit = productModel.Unit.Name,
             CurrentCost = productModel.CurrentCost,
             ImageUrl = productModel.CoreProduct.ImageUrl,
             Category = new CategoryEntity
             {
                 Id = productModel.CategoryId,
+                Cen = productModel.Category.Cen,
                 Name = productModel.Category.Name,
+                Description = productModel.Category.Description,
                 CompanyId = productModel.CompanyId
             },
             Status = MapStatus(productModel),
             Warehouses = productModel.ProductWarehouses.Select(pw => new WarehouseStockEntity
             {
                 WarehouseId = pw.WarehouseId,
+                WarehouseCen = pw.Warehouse.Cen,
                 Stock = pw.Quantity,
                 WarehouseName = pw.Warehouse.Name
             }).ToList(),
@@ -350,6 +386,8 @@ public class ProductRepository : IProductRepository
         return new ProductStockEntity
         {
             ProductId = product.Id,
+            ProductCen = product.Cen,
+            Sku = product.Sku,
             ProductName = product.CoreProduct.Name,
             Unit = product.Unit.Name,
             CurrentCost = product.CurrentCost,
@@ -367,7 +405,10 @@ public class ProductRepository : IProductRepository
             productWarehouseStockEntities.Add(new ProductWarehouseStockEntity
             {
                 ProductId = productModel.Id,
+                ProductCen = productModel.Cen,
+                Sku = productModel.Sku,
                 WarehouseId = warehouse.WarehouseId,
+                WarehouseCen = warehouse.Warehouse.Cen,
                 Stock = warehouse.Quantity,
             });
         }
@@ -392,5 +433,20 @@ public class ProductRepository : IProductRepository
             "discontinued" => Domain.Enums.ProductStatus.Discontinued,
             _ => Domain.Enums.ProductStatus.Unavailable
         };
+    }
+
+    private static string ResolveProductCen(ProductCompanyEntity productCompanyEntity)
+    {
+        if (!string.IsNullOrWhiteSpace(productCompanyEntity.Cen))
+        {
+            return productCompanyEntity.Cen;
+        }
+
+        if (!string.IsNullOrWhiteSpace(productCompanyEntity.Sku))
+        {
+            return productCompanyEntity.Sku;
+        }
+
+        return Guid.NewGuid().ToString();
     }
 }

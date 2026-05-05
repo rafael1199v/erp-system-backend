@@ -33,6 +33,7 @@ public class WarehouseRepository : IWarehouseRepository
         return new WarehouseEntity
         {
             Id = warehouseModel.Id,
+            Cen = warehouseModel.Cen,
             Name = warehouseModel.Name,
         };
     }

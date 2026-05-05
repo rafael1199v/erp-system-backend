@@ -38,6 +38,7 @@ public class TransactionRepository : ITransactionRepository
         return new TransactionEntity
         {
             Id = transactionModel.Id,
+            Cen = transactionModel.Cen,
             Quantity = transactionModel.Quantity,
             Reason = transactionModel.Reason ?? "No reason provided",
             TransactionDate = transactionModel.TransactionDate,
@@ -47,7 +48,11 @@ public class TransactionRepository : ITransactionRepository
             Product = new ProductEntity
             {
                 ProductId = transactionModel.Product.Id,
+                Cen = transactionModel.Product.Cen,
+                Sku = transactionModel.Product.Sku,
                 ProductName = transactionModel.Product.CoreProduct.Name,
+                Description = transactionModel.Product.Description,
+                StationCode = transactionModel.Product.StationCode,
                 Unit = transactionModel.Product.Unit.Name,
                 CurrentCost = transactionModel.Product.CurrentCost,
                 ImageUrl = transactionModel.Product.CoreProduct.ImageUrl,
@@ -57,6 +62,7 @@ public class TransactionRepository : ITransactionRepository
             Warehouse = new WarehouseEntity
             {
                 Id = transactionModel.Warehouse.Id,
+                Cen = transactionModel.Warehouse.Cen,
                 Name = transactionModel.Warehouse.Name
             }
         };
