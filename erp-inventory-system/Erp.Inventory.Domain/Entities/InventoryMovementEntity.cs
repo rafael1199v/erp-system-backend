@@ -5,7 +5,9 @@ namespace Erp.Inventory.Domain.Entities;
 public class InventoryMovementEntity
 {
     public required int Id { get; set; }
+    public string Cen { get; set; } = string.Empty;
     public required string Title { get; set; } = string.Empty;
+    public string? ExternalReference { get; set; }
     public required DateOnly MovementDate { get; set; }
     public required MovementTypeEnum MovementType { get; set; }
     public required MovementStatusEnum MovementStatus { get; set; }

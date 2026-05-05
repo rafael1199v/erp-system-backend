@@ -3,6 +3,10 @@ namespace Erp.Inventory.Domain.Entities;
 public class ProductCompanyEntity
 {
     public required int Id { get; init; }
+    public string Cen { get; init; } = string.Empty;
+    public string? Sku { get; init; }
+    public string? Description { get; init; }
+    public string? StationCode { get; init; }
     public required int CoreProductId { get; init; }
     public required int UnitId { get; init; }
     public required int CompanyId { get; init; }
@@ -25,7 +29,10 @@ public class ProductCompanyEntity
         int supplierId,
         decimal currentCost,
         int reorderLevel,
-        decimal sellPrice
+        decimal sellPrice,
+        string? sku = null,
+        string? description = null,
+        string? stationCode = null
     )
     {
         ValidatePricing(currentCost, sellPrice);
@@ -33,6 +40,10 @@ public class ProductCompanyEntity
         return new ProductCompanyEntity
         {
             Id = 0,
+            Cen = string.IsNullOrWhiteSpace(sku) ? Guid.NewGuid().ToString() : sku,
+            Sku = sku,
+            Description = description,
+            StationCode = stationCode,
             CoreProductId = 0,
             UnitId = unitId,
             CompanyId = companyId,
@@ -62,7 +73,10 @@ public class ProductCompanyEntity
         int supplierId,
         decimal currentCost,
         int reorderLevel,
-        decimal sellPrice
+        decimal sellPrice,
+        string? sku = null,
+        string? description = null,
+        string? stationCode = null
     )
     {
         ValidatePricing(currentCost, sellPrice);
@@ -70,6 +84,9 @@ public class ProductCompanyEntity
         return new ProductCompanyEntity
         {
             Id = productId,
+            Sku = sku,
+            Description = description,
+            StationCode = stationCode,
             CoreProductId = 0,
             UnitId = unitId,
             CompanyId = companyId,
