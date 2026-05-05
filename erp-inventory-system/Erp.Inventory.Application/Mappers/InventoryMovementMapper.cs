@@ -12,6 +12,10 @@ public class InventoryMovementMapper : IInventoryMovementMapper
         return new InventoryMovementEntity
         {
             Id = 0,
+            Cen = string.IsNullOrWhiteSpace(createInventoryMovementDTO.Cen)
+                ? Guid.NewGuid().ToString()
+                : createInventoryMovementDTO.Cen,
+            ExternalReference = createInventoryMovementDTO.ExternalReference,
             Title = createInventoryMovementDTO.Title,
             CompanyId = createInventoryMovementDTO.CompanyId,
             MovementDate = DateOnly.ParseExact(createInventoryMovementDTO.MovementDate, "yyyy-MM-dd",
@@ -21,6 +25,9 @@ public class InventoryMovementMapper : IInventoryMovementMapper
             Transactions = createInventoryMovementDTO.Transactions.Select(createTransactionDto => new TransactionEntity
             {
                 Id = 0,
+                Cen = string.IsNullOrWhiteSpace(createTransactionDto.Cen)
+                    ? Guid.NewGuid().ToString()
+                    : createTransactionDto.Cen,
                 Quantity = createTransactionDto.Quantity,
                 Reason = createTransactionDto.Reason,
                 TransactionDate = DateOnly.ParseExact(createTransactionDto.TransactionDate, "yyyy-MM-dd",
@@ -37,6 +44,8 @@ public class InventoryMovementMapper : IInventoryMovementMapper
         return new InventoryMovementDTO
         {
             Id = inventoryMovementEntity.Id,
+            Cen = inventoryMovementEntity.Cen,
+            ExternalReference = inventoryMovementEntity.ExternalReference,
             Title = inventoryMovementEntity.Title,
             MovementDate = inventoryMovementEntity.MovementDate.ToString(),
             MovementStatus = (int)inventoryMovementEntity.MovementStatus,
@@ -44,6 +53,7 @@ public class InventoryMovementMapper : IInventoryMovementMapper
             Transactions = inventoryMovementEntity.Transactions.Select(t => new TransactionDTO
             {
                 Id = t.Id,
+                Cen = t.Cen,
                 Quantity = t.Quantity,
                 Reason = t.Reason,
                 TransactionDate = t.TransactionDate.ToString(),

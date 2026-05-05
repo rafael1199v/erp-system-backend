@@ -5,6 +5,8 @@ namespace Erp.Inventory.Domain.Entities;
 public class InventoryMovementEntity
 {
     public required int Id { get; set; }
+    public string Cen { get; set; } = Guid.NewGuid().ToString();
+    public string? ExternalReference { get; set; }
     public required string Title { get; set; } = string.Empty;
     public required DateOnly MovementDate { get; set; }
     public required MovementTypeEnum MovementType { get; set; }

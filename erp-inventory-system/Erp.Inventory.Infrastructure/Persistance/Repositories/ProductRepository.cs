@@ -115,6 +115,10 @@ public class ProductRepository : IProductRepository
 
             Product product = new()
             {
+                Cen = string.IsNullOrWhiteSpace(productCompanyEntity.Sku)
+                    ? Guid.NewGuid().ToString()
+                    : productCompanyEntity.Sku,
+                Sku = productCompanyEntity.Sku,
                 CoreProductId = coreProductId,
                 UnitId = productCompanyEntity.UnitId,
                 CompanyId = productCompanyEntity.CompanyId,
@@ -177,6 +181,11 @@ public class ProductRepository : IProductRepository
         product.CurrentCost = productCompanyEntity.CurrentCost;
         product.ReorderLevel = productCompanyEntity.ReorderLevel;
         product.SellPrice = productCompanyEntity.SellPrice;
+        if (!string.IsNullOrWhiteSpace(productCompanyEntity.Sku))
+        {
+            product.Sku = productCompanyEntity.Sku;
+            product.Cen = productCompanyEntity.Sku;
+        }
 
         await _context.SaveChangesAsync();
         return true;

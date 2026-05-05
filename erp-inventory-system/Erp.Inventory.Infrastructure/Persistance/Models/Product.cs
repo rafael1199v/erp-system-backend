@@ -1,11 +1,21 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
+using System.ComponentModel.DataAnnotations;
+
 namespace Erp.Inventory.Infrastructure.Persistance.Models;
 
 public class Product
 {
     [Column("id")]
     public int Id { get; set; }
+
+    [Column("cen")]
+    [MaxLength(64)]
+    public string Cen { get; set; } = Guid.NewGuid().ToString();
+
+    [Column("sku")]
+    [MaxLength(80)]
+    public string? Sku { get; set; }
     
     [Column("core_product_id")]
     public int CoreProductId { get; set; }

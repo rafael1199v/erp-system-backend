@@ -7,6 +7,10 @@ public class Category
 {
     [Column("id")]
     public int Id { get; set; }
+
+    [Column("cen")]
+    [MaxLength(64)]
+    public string Cen { get; set; } = Guid.NewGuid().ToString();
     
     [Column("name")]
     [Required, MaxLength(100)]

@@ -15,6 +15,7 @@ using Erp.Inventory.Contracts;
 using Erp.Inventory.Infrastructure.Persistance.Context;
 using Erp.Inventory.Infrastructure.Persistance.Repositories;
 using Erp.Inventory.Presentation.Controllers;
+using Erp.Inventory.Presentation.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +35,7 @@ public static class InventoryModule
         services.AddControllers().AddApplicationPart(typeof(UnitController).Assembly);
         services.AddControllers().AddApplicationPart(typeof(SupplierController).Assembly);
         services.AddControllers().AddApplicationPart(typeof(DashboardController).Assembly);
+        services.AddControllers().AddApplicationPart(typeof(InventoryContractController).Assembly);
         
         services.AddScoped<IGetCompaniesUseCase, GetCompaniesUseCase>();
 
@@ -82,6 +84,7 @@ public static class InventoryModule
         services.AddScoped<ISupplierRepository, SupplierRepository>();
 
         services.AddScoped<IInventoryService, InventoryService>();
+        services.AddScoped<IInventoryCenResolver, InventoryCenResolver>();
         
         return services;
     }

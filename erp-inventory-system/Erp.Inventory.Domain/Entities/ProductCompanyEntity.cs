@@ -12,6 +12,7 @@ public class ProductCompanyEntity
     public required decimal CurrentCost { get; init; }
     public required int ReorderLevel { get; init; }
     public required decimal SellPrice { get; init; }
+    public string? Sku { get; init; }
     public required CoreProductEntity? CoreProduct { get; init; }
 
 
@@ -25,7 +26,8 @@ public class ProductCompanyEntity
         int supplierId,
         decimal currentCost,
         int reorderLevel,
-        decimal sellPrice
+        decimal sellPrice,
+        string? sku = null
     )
     {
         ValidatePricing(currentCost, sellPrice);
@@ -42,6 +44,7 @@ public class ProductCompanyEntity
             CurrentCost = currentCost,
             ReorderLevel = reorderLevel,
             SellPrice = sellPrice,
+            Sku = sku,
             CoreProduct = new CoreProductEntity
             {
                 Id = 0,
@@ -62,7 +65,8 @@ public class ProductCompanyEntity
         int supplierId,
         decimal currentCost,
         int reorderLevel,
-        decimal sellPrice
+        decimal sellPrice,
+        string? sku = null
     )
     {
         ValidatePricing(currentCost, sellPrice);
@@ -79,6 +83,7 @@ public class ProductCompanyEntity
             CurrentCost = currentCost,
             ReorderLevel = reorderLevel,
             SellPrice = sellPrice,
+            Sku = sku,
             CoreProduct = new CoreProductEntity
             {
                 Id = 0,

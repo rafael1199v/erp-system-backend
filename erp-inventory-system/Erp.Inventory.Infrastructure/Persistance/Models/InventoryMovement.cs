@@ -8,6 +8,14 @@ public class InventoryMovement
     [Column("id")]
     public int Id { get; set; }
 
+    [Column("cen")]
+    [MaxLength(64)]
+    public string Cen { get; set; } = Guid.NewGuid().ToString();
+
+    [Column("external_reference")]
+    [MaxLength(120)]
+    public string? ExternalReference { get; set; }
+
     [Required, Column("title"), MaxLength(100)]
     public string Title { get; set; } = string.Empty;
     

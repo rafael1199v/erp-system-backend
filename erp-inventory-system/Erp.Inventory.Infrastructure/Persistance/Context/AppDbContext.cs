@@ -30,6 +30,38 @@ public class AppDbContext : DbContext
     {
         modelBuilder.Entity<ProductWarehouse>()
             .HasKey(pw => new { pw.ProductId, pw.WarehouseId });
+
+        modelBuilder.Entity<Company>()
+            .HasIndex(c => c.Cen)
+            .IsUnique();
+
+        modelBuilder.Entity<Category>()
+            .HasIndex(c => new { c.CompanyId, c.Cen })
+            .IsUnique();
+
+        modelBuilder.Entity<Unit>()
+            .HasIndex(u => new { u.CompanyId, u.Cen })
+            .IsUnique();
+
+        modelBuilder.Entity<Warehouse>()
+            .HasIndex(w => new { w.CompanyId, w.Cen })
+            .IsUnique();
+
+        modelBuilder.Entity<Product>()
+            .HasIndex(p => new { p.CompanyId, p.Cen })
+            .IsUnique();
+
+        modelBuilder.Entity<Product>()
+            .HasIndex(p => new { p.CompanyId, p.Sku })
+            .IsUnique();
+
+        modelBuilder.Entity<InventoryMovement>()
+            .HasIndex(m => m.Cen)
+            .IsUnique();
+
+        modelBuilder.Entity<Transaction>()
+            .HasIndex(t => t.Cen)
+            .IsUnique();
         
         modelBuilder.Entity<Category>().ToTable("categories");
         modelBuilder.Entity<ProductStatus>().ToTable("product_statuses");
