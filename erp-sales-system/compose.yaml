@@ -1,0 +1,7 @@
+﻿services:
+  sales.api:
+    image: sales.api
+    build:
+      context: .
+      dockerfile: Sales.API/Dockerfile
+

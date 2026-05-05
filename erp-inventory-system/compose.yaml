@@ -1,0 +1,7 @@
+﻿services:
+  erp-inventory-system:
+    image: erp-inventory-system
+    build:
+      context: .
+      dockerfile: erp-inventory-system/Dockerfile
+

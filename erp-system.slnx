@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/contracts/">
+    <Project Path="Inventory.Contracts/Inventory.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/erp-inventory-system/">
+    <Project Path="erp-inventory-system/Erp.Inventory.Application/Erp.Inventory.Application.csproj" />
+    <Project Path="erp-inventory-system/Erp.Inventory.Domain/Erp.Inventory.Domain.csproj" />
+    <Project Path="erp-inventory-system/Erp.Inventory.Infrastructure/Erp.Inventory.Infrastructure.csproj" />
+    <Project Path="erp-inventory-system/Erp.Inventory.Presentation/Erp.Inventory.Presentation.csproj" />
+    <Project Path="erp-inventory-system/Inventory.API/Inventory.API.csproj" />
+  </Folder>
+  <Folder Name="/erp-sales-system/">
+    <Project Path="erp-sales-system/Erp.Sales.Application/Erp.Sales.Application.csproj" />
+    <Project Path="erp-sales-system/Erp.Sales.Domain/Erp.Sales.Domain.csproj" />
+    <Project Path="erp-sales-system/Erp.Sales.Infrastructure/Erp.Sales.Infrastructure.csproj" />
+    <Project Path="erp-sales-system/Erp.Sales.Presentation/Erp.Sales.Presentation.csproj" />
+    <Project Path="erp-sales-system/Sales.API/Sales.API.csproj" />
+  </Folder>
+</Solution>
