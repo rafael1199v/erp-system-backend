@@ -357,7 +357,9 @@ public class ProductRepository : IProductRepository
             Description = productModel.Description,
             StationCode = productModel.StationCode,
             Unit = productModel.Unit.Name,
+            UnitCen = productModel.Unit.Cen,
             CurrentCost = productModel.CurrentCost,
+            SellPrice = productModel.SellPrice,
             ImageUrl = productModel.CoreProduct.ImageUrl,
             Category = new CategoryEntity
             {

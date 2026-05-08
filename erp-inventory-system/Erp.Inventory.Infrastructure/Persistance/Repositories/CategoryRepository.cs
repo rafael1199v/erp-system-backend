@@ -51,6 +51,7 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
                 throw new Exception("La categoria no existe");
 
             categoryModel.Name = categoryEntity.Name;
+            categoryModel.Description = categoryEntity.Description;
             await context.SaveChangesAsync();
         }
         catch

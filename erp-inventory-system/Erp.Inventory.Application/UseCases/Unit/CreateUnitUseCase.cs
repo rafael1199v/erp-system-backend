@@ -8,7 +8,10 @@ public class CreateUnitUseCase(IUnitRepository unitRepository) : ICreateUnitUseC
 {
     public async Task<int> ExecuteAsync(CreateUnitDto createUnitDto)
     {
-        UnitEntity unit = UnitEntity.Create(name: createUnitDto.Name, companyId: createUnitDto.CompanyId);
+        UnitEntity unit = UnitEntity.Create(
+            name: createUnitDto.Name,
+            companyId: createUnitDto.CompanyId,
+            abbreviation: createUnitDto.Abbreviation);
 
         return await unitRepository.CreateAsync(unit);
     }

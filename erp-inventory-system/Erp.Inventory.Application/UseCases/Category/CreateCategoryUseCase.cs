@@ -9,7 +9,10 @@ public class CreateCategoryUseCase(ICategoryRepository categoryRepository) : ICr
     public async Task<int> ExecuteAsync(CreateCategoryDto createCategoryDto)
     {
         CategoryEntity category =
-            CategoryEntity.Create(name: createCategoryDto.Name, companyId: createCategoryDto.CompanyId);
+            CategoryEntity.Create(
+                name: createCategoryDto.Name,
+                companyId: createCategoryDto.CompanyId,
+                description: createCategoryDto.Description);
 
         return await categoryRepository.Create(category);
     }

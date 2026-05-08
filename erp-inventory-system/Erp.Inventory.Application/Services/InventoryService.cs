@@ -81,6 +81,7 @@ public class InventoryService(
             {
                 ProductId = requirement.ProductId,
                 ProductName = productNames.GetValueOrDefault(requirement.ProductId, "Producto no encontrado"),
+                WarehouseId = requirement.WarehouseId,
                 RequestedQuantity = requirement.RequestedQuantity,
                 AvailableQuantity = availableQuantity
             });

@@ -4,5 +4,5 @@ namespace Erp.Inventory.Application.UseCases.Movement;
 
 public interface ICreateAdjustmentMovementUseCase
 {
-    Task ExecuteAsync(CreateInventoryMovementDTO createInventoryMovementDto);
+    Task<InventoryMovementDTO> ExecuteAsync(CreateInventoryMovementDTO createInventoryMovementDto);
 }

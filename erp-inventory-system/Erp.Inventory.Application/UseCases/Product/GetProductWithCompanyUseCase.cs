@@ -14,6 +14,8 @@ public class GetProductWithCompanyUseCase(IProductRepository productRepository) 
 
         return new ProductDto(
             Id: productWithCompanyEntity.Id,
+            Cen: productWithCompanyEntity.Cen,
+            Sku: productWithCompanyEntity.Sku,
             Name: productWithCompanyEntity.CoreProduct!.Name,
             ImageUrl: productWithCompanyEntity.CoreProduct.ImageUrl,
             UnitId: productWithCompanyEntity.UnitId,
@@ -23,7 +25,9 @@ public class GetProductWithCompanyUseCase(IProductRepository productRepository) 
             ProductStatusId: productWithCompanyEntity.ProductStatusId,
             CurrentCost: productWithCompanyEntity.CurrentCost,
             ReorderLevel: productWithCompanyEntity.ReorderLevel,
-            SellPrice: productWithCompanyEntity.SellPrice
+            SellPrice: productWithCompanyEntity.SellPrice,
+            Description: productWithCompanyEntity.Description,
+            StationCode: productWithCompanyEntity.StationCode
         );
     }
 }

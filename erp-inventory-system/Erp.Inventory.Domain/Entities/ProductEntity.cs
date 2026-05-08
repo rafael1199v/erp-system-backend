@@ -11,7 +11,9 @@ public class ProductEntity
     public string? Description { get; set; }
     public string? StationCode { get; set; }
     public string Unit { get; set; } = string.Empty;
+    public string UnitCen { get; set; } = string.Empty;
     public decimal CurrentCost { get; set; }
+    public decimal SellPrice { get; set; }
     public string? ImageUrl { get; set; }
     public CategoryEntity? Category { get; set; }
     public ProductStatus Status { get; set; } = ProductStatus.Unavailable;

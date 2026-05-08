@@ -9,7 +9,8 @@ public class UpdateCategoryUseCase(ICategoryRepository categoryRepository) : IUp
     public async Task ExecuteAsync(CategoryDto category)
     {
         var categoryEntities = await categoryRepository.GetAllByCompany(category.CompanyId);
-        var existsName = categoryEntities.Any(c => string.Equals(c.Name.Trim(), category.Name.Trim(), StringComparison.CurrentCultureIgnoreCase));
+        var existsName = categoryEntities.Any(c => c.Id != category.Id
+                                                   && string.Equals(c.Name.Trim(), category.Name.Trim(), StringComparison.CurrentCultureIgnoreCase));
 
         if (existsName)
         {
@@ -19,7 +20,9 @@ public class UpdateCategoryUseCase(ICategoryRepository categoryRepository) : IUp
         var categoryEntity = new CategoryEntity
         {
             Id = category.Id,
+            Cen = category.Cen,
             Name = category.Name,
+            Description = category.Description,
             CompanyId =  category.CompanyId
         };
         

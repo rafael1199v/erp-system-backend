@@ -17,17 +17,23 @@ public class InventoryMovementRepository : IInventoryMovementRepository
         this._context = context;
     }
     
-    public async Task CreateMovementAsync(InventoryMovementEntity inventoryMovementEntity)
+    public async Task<InventoryMovementEntity> CreateMovementAsync(InventoryMovementEntity inventoryMovementEntity)
     {
         InventoryMovement inventoryMovement = this.ToModel(inventoryMovementEntity);
         await _context.InventoryMovements.AddAsync(inventoryMovement);
         await _context.SaveChangesAsync();
+
+        return ToDomain(inventoryMovement);
     }
 
     public async Task<List<InventoryMovementEntity>> GetMovementsByTypeAsync(MovementTypeEnum movementType, int companyId)
     {
         var movements = await _context.InventoryMovements
-            .Include(m => m.Transactions)    
+            .Include(m => m.Transactions)
+            .ThenInclude(t => t.Product)
+            .ThenInclude(p => p.CoreProduct)
+            .Include(m => m.Transactions)
+            .ThenInclude(t => t.Warehouse)
             .Where(m => m.MovementTypeId == (int)movementType && m.CompanyId == companyId).ToListAsync();
         
         return Enumerable.ToList(movements.Select(ToDomain));
@@ -37,7 +43,11 @@ public class InventoryMovementRepository : IInventoryMovementRepository
     {
         var movements = await Queryable
             .Where<InventoryMovement>(_context.InventoryMovements
-                .Include(m => m.Transactions), m => m.CompanyId == companyId)
+                .Include(m => m.Transactions)
+                .ThenInclude(t => t.Product)
+                .ThenInclude(p => p.CoreProduct)
+                .Include(m => m.Transactions)
+                .ThenInclude(t => t.Warehouse), m => m.CompanyId == companyId)
             .ToListAsync();
         
         return  Enumerable.ToList(movements.Select(ToDomain));
@@ -92,7 +102,32 @@ public class InventoryMovementRepository : IInventoryMovementRepository
                 TransactionDate = t.TransactionDate,
                 TransactionType = (TransactionTypeEnum)t.TransactionTypeId,
                 WarehouseId = t.WarehouseId,
-                ProductId = t.ProductId
+                ProductId = t.ProductId,
+                Product = t.Product is null
+                    ? null
+                    : new ProductEntity
+                    {
+                        ProductId = t.Product.Id,
+                        Cen = t.Product.Cen,
+                        Sku = t.Product.Sku,
+                        ProductName = t.Product.CoreProduct?.Name ?? string.Empty,
+                        Description = t.Product.Description,
+                        StationCode = t.Product.StationCode,
+                        Unit = string.Empty,
+                        CurrentCost = t.Product.CurrentCost,
+                        SellPrice = t.Product.SellPrice,
+                        ReorderLevel = t.Product.ReorderLevel,
+                        IsActive = t.Product.IsActive
+                    },
+                Warehouse = t.Warehouse is null
+                    ? null
+                    : new WarehouseEntity
+                    {
+                        Id = t.Warehouse.Id,
+                        Cen = t.Warehouse.Cen,
+                        Name = t.Warehouse.Name,
+                        CompanyId = t.Warehouse.CompanyId
+                    }
             }).ToList()
         };
     }

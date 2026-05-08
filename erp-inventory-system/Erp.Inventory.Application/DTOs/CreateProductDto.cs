@@ -10,5 +10,8 @@ public record CreateProductDto(
     int CategoryId,
     decimal CurrentCost,
     int ReorderLevel,
-    decimal SellPrice
+    decimal SellPrice,
+    string? Sku = null,
+    string? Description = null,
+    string? StationCode = null
 );

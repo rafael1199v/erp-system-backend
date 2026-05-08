@@ -8,13 +8,14 @@ public class UnitEntity
     public string? Abbreviation { get; init; }
     public required int CompanyId { get; init; }
     
-    public static UnitEntity Create(string name, int companyId)
+    public static UnitEntity Create(string name, int companyId, string? abbreviation = null)
     {
         return new UnitEntity
         {
             Id = 0,
             Cen = Guid.NewGuid().ToString(),
             Name = name,
+            Abbreviation = abbreviation,
             CompanyId = companyId
         };
     }

@@ -47,6 +47,7 @@ public class UnitRepository(AppDbContext context, ILogger<UnitRepository> logger
             }
             
             unitModel.Name = unit.Name;
+            unitModel.Abbreviation = unit.Abbreviation;
             await context.SaveChangesAsync();
         }
         catch (Exception ex)

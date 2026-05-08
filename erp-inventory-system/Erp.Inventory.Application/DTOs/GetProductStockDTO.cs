@@ -3,6 +3,8 @@ namespace Erp.Inventory.Application.DTOs;
 public class GetProductStockDTO
 {
     public int ProductId { get; set; }
+    public string ProductCen { get; set; } = string.Empty;
+    public string? Sku { get; set; }
     public string ProductName { get; set; } = string.Empty;
     public string Unit { get; set; } = string.Empty;
     public decimal CurrentCost { get; set; }

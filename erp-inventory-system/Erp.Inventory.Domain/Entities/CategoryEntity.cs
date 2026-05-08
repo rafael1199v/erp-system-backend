@@ -8,13 +8,14 @@ public class CategoryEntity
     public string? Description { get; init; }
     public required int CompanyId { get; init; }
 
-    public static CategoryEntity Create(string name, int companyId)
+    public static CategoryEntity Create(string name, int companyId, string? description = null)
     {
         return new CategoryEntity
         {
             Id = 0,
             Cen = Guid.NewGuid().ToString(),
             Name = name,
+            Description = description,
             CompanyId = companyId
         };
     }

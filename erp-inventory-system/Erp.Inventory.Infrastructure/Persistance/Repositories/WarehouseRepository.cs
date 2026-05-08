@@ -35,6 +35,7 @@ public class WarehouseRepository : IWarehouseRepository
             Id = warehouseModel.Id,
             Cen = warehouseModel.Cen,
             Name = warehouseModel.Name,
+            CompanyId = warehouseModel.CompanyId
         };
     }
 }
