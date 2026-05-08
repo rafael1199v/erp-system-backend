@@ -15,6 +15,7 @@ using Erp.Inventory.Contracts;
 using Erp.Inventory.Infrastructure.Persistance.Context;
 using Erp.Inventory.Infrastructure.Persistance.Repositories;
 using Erp.Inventory.Infrastructure.Persistance.Services;
+using Erp.Inventory.Presentation.ContractAdapters;
 using Erp.Inventory.Presentation.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -84,6 +85,11 @@ public static class InventoryModule
 
         services.AddScoped<IInventoryService, InventoryService>();
         services.AddScoped<IInventoryCenResolver, InventoryCenResolver>();
+        services.AddScoped<IInventoryContractMapper, InventoryContractMapper>();
+        services.AddScoped<IInventoryCatalogContractAdapter, InventoryCatalogContractAdapter>();
+        services.AddScoped<IInventoryProductContractAdapter, InventoryProductContractAdapter>();
+        services.AddScoped<IInventoryStockContractAdapter, InventoryStockContractAdapter>();
+        services.AddScoped<IInventoryMovementContractAdapter, InventoryMovementContractAdapter>();
         
         return services;
     }
