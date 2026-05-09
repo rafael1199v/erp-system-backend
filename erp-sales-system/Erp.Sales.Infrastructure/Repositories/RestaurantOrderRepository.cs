@@ -138,6 +138,7 @@ public class RestaurantOrderRepository(SalesDbContext salesDbContext) : IRestaur
         return new RestaurantOrderModel
         {
             Id = entity.Id,
+            Cen = string.IsNullOrWhiteSpace(entity.Cen) ? Guid.NewGuid().ToString() : entity.Cen,
             OrderId = entity.OrderId,
             WaiterId = entity.WaiterId,
         };
@@ -149,9 +150,11 @@ public class RestaurantOrderRepository(SalesDbContext salesDbContext) : IRestaur
         return new RestaurantOrder
         {
             Id = model.Id,
+            Cen = model.Cen,
             OrderId = model.Id,
             TaxPrice = model.Order.TaxPrice,
             CompanyId = model.Order.CompanyId,
+            CompanyCen = model.Order.CompanyCen,
             CustomerId = model.Order.CustomerId,
             WaiterId = model.WaiterId,
             OrderDatetime = model.Order.OrderDatetime,

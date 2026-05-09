@@ -10,6 +10,7 @@ public class CustomerModel
     public string Email { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
     public int CompanyId { get; set; }
+    public string? CompanyCen { get; set; }
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public bool IsDeleted { get; set; } = false;

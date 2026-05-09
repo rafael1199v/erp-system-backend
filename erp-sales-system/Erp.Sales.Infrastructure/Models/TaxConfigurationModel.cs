@@ -6,6 +6,7 @@ namespace Erp.Sales.Infrastructure.Models;
 public class TaxConfigurationModel
 {
     public int CompanyId { get; set; }
+    public string? CompanyCen { get; set; }
     public decimal GlobalTaxPercentage { get; set; }
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

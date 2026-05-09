@@ -85,8 +85,12 @@ public class RestaurantOrderDetailRepository(SalesDbContext salesDbContext) : IR
 		return new RestaurantOrderDetailModel
 		{
 			Id = restaurantOrderDetail.Id,
+			Cen = string.IsNullOrWhiteSpace(restaurantOrderDetail.Cen)
+				? Guid.NewGuid().ToString()
+				: restaurantOrderDetail.Cen,
 			RestaurantOrderId = restaurantOrderDetail.RestaurantOrderId,
 			ProductId = restaurantOrderDetail.ProductId,
+			ProductCen = restaurantOrderDetail.ProductCen,
 			RestaurantOrderDetailStatusId = (int)restaurantOrderDetail.Status,
 			Note = restaurantOrderDetail.Note,
 			Quantity = restaurantOrderDetail.Quantity,
@@ -100,8 +104,11 @@ public class RestaurantOrderDetailRepository(SalesDbContext salesDbContext) : IR
 		return new RestaurantOrderDetail
 		{
 			Id = model.Id,
+			Cen = model.Cen,
 			RestaurantOrderId = model.RestaurantOrderId,
+			TicketCen = model.RestaurantOrder?.Cen ?? string.Empty,
 			ProductId = model.ProductId,
+			ProductCen = model.ProductCen,
 			Status = (OrderDetailStatus)model.RestaurantOrderDetailStatusId,
 			Note = model.Note,
 			Quantity = model.Quantity,

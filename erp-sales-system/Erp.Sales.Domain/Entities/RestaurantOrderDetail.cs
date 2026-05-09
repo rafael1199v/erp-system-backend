@@ -5,8 +5,11 @@ namespace Erp.Sales.Domain.Entities;
 public class RestaurantOrderDetail
 {
     public required int Id { get; set; }
+    public string Cen { get; set; } = string.Empty;
     public required int RestaurantOrderId { get; set; }
+    public string TicketCen { get; set; } = string.Empty;
     public required int ProductId { get; set; }
+    public string? ProductCen { get; set; }
     public required OrderDetailStatus Status { get; set; }
     public string? Note { get; set; }
     public required int Quantity { get; set; }
@@ -24,6 +27,7 @@ public class RestaurantOrderDetail
         return new RestaurantOrderDetail
         {
             Id = 0,
+            Cen = string.Empty,
             RestaurantOrderId = restaurantOrderId,
             ProductId = productId,
             Status = OrderDetailStatus.Created,

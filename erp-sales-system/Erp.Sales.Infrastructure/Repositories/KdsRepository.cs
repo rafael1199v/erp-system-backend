@@ -28,8 +28,10 @@ public class KdsRepository(SalesDbContext salesDbContext) : IKdsRepository
             .Select(t => new KdsTeam
             {
                 Id = t.Id,
+                Cen = t.Cen,
                 Name = t.Name,
-                CategoryIds = categoryMap.GetValueOrDefault(t.Id, [])
+                CategoryIds = categoryMap.GetValueOrDefault(t.Id, []),
+                CategoryCens = []
             })];
     }
 
@@ -54,6 +56,7 @@ public class KdsRepository(SalesDbContext salesDbContext) : IKdsRepository
         return new KdsTeam
         {
             Id = teamModel.Id,
+            Cen = teamModel.Cen,
             Name = teamModel.Name,
             CategoryIds = categoryIds
         };
@@ -74,8 +77,11 @@ public class KdsRepository(SalesDbContext salesDbContext) : IKdsRepository
             .Select(rod => new KdsOrderDetail
             {
                 ProductId = rod.ProductId,
+                ProductCen = rod.ProductCen,
                 RestaurantOrderDetailId = rod.Id,
+                TicketItemCen = rod.Cen,
                 RestaurantOrderId = rod.RestaurantOrderId,
+                TicketCen = rod.RestaurantOrder.Cen,
                 Quantity = rod.Quantity,
                 RestaurantOrderDetailStatus = (OrderDetailStatus)rod.RestaurantOrderDetailStatusId,
                 Note = rod.Note,

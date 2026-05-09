@@ -11,6 +11,7 @@ using Erp.Sales.Infrastructure;
 using Erp.Sales.Infrastructure.Http;
 using Erp.Sales.Infrastructure.Pdf;
 using Erp.Sales.Infrastructure.Repositories;
+using Erp.Sales.Infrastructure.Services;
 using Erp.Sales.Presentation.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -74,6 +75,7 @@ public static class SalesModule
         services.AddScoped<IDashboardRepository, DashboardRepository>();
         services.AddScoped<IPaymentTypeRepository, PaymentTypeRepository>();
         services.AddScoped<IPaymentProcessRepository, PaymentProcessRepository>();
+        services.AddScoped<ISalesCenResolver, SalesCenResolver>();
 
         services.AddHttpClient<IInventoryService, InventoryHttpClient>(client =>
         {

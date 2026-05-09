@@ -11,6 +11,7 @@ public class SaleDetailModel
     public SaleModel Sale { get; set; } = null!;
     
     public int ProductId { get; set; }
+    public string? ProductCen { get; set; }
     public decimal Price { get; set; }
     public int Quantity { get; set; }
     

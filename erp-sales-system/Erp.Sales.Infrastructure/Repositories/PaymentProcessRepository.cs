@@ -22,6 +22,7 @@ public class PaymentProcessRepository(SalesDbContext salesDbContext) : IPaymentP
 
             var saleModel = new SaleModel
             {
+                Cen = string.IsNullOrWhiteSpace(sale.Cen) ? Guid.NewGuid().ToString() : sale.Cen,
                 SubtotalPrice = sale.SubtotalPrice,
                 TaxPrice = sale.TaxPrice,
                 DiscountPercentage = sale.DiscountPercentage,
@@ -29,9 +30,11 @@ public class PaymentProcessRepository(SalesDbContext salesDbContext) : IPaymentP
                 CustomerId = sale.CustomerId,
                 PaymentTypeId = sale.PaymentTypeId,
                 CompanyId = sale.CompanyId,
+                CompanyCen = sale.CompanyCen,
                 SaleDetails = sale.SaleDetails.Select(detail => new SaleDetailModel
                 {
                     ProductId = detail.ProductId,
+                    ProductCen = detail.ProductCen,
                     Price = detail.Price,
                     Quantity = detail.Quantity
                 }).ToList()
