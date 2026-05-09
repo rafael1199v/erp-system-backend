@@ -5,5 +5,6 @@ public record CreateRestaurantOrderDetail(
     int ProductId,
     string? Note,
     int Quantity,
-    string? CreatedAt
+    string? CreatedAt,
+    string? ProductCen = null
 );

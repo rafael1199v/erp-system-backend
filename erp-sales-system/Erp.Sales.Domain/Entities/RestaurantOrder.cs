@@ -20,12 +20,13 @@ public class RestaurantOrder
     public int? CustomerId { get; set; }
     
     
-    public static RestaurantOrder Create(decimal taxPrice, int companyId)
+    public static RestaurantOrder Create(decimal taxPrice, int companyId, string? companyCen = null)
     {
         return new RestaurantOrder
         {
             TaxPrice = taxPrice,
             CompanyId = companyId,
+            CompanyCen = companyCen,
             Id = 0,
             Cen = string.Empty,
             OrderId = 0,

@@ -34,7 +34,11 @@ public class PaymentController(
                 return BadRequest(result);
             }
 
-            return Ok(new { saleId = result.SaleId });
+            return Ok(new
+            {
+                saleId = result.SaleId,
+                inventoryDocumentCen = result.InventoryDocumentCen
+            });
         }
         catch (Exception ex)
         {

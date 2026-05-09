@@ -13,4 +13,12 @@ public class WarehouseConfigurationRepository(SalesDbContext salesDbContext) : I
             .Select(wc => (int?)wc.MainWarehouseId)
             .FirstOrDefaultAsync();
     }
+
+    public async Task<string?> GetWarehouseCenByCompanyIdAsync(int companyId)
+    {
+        return await salesDbContext.WarehouseConfigurations
+            .Where<WarehouseConfigurationModel>(wc => wc.CompanyId == companyId && !wc.IsDeleted)
+            .Select(wc => wc.MainWarehouseCen)
+            .FirstOrDefaultAsync();
+    }
 }

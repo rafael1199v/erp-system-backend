@@ -17,7 +17,12 @@ public class RestaurantOrderDetail
     public DateTime? SentAt { get; set; }
     public required DateTime CreatedAt { get; set; }
 
-    public static RestaurantOrderDetail Create(int restaurantOrderId, int productId, int quantity, string? note)
+    public static RestaurantOrderDetail Create(
+        int restaurantOrderId,
+        int productId,
+        int quantity,
+        string? note,
+        string? productCen = null)
     {
         if (quantity < 1)
         {
@@ -30,6 +35,7 @@ public class RestaurantOrderDetail
             Cen = string.Empty,
             RestaurantOrderId = restaurantOrderId,
             ProductId = productId,
+            ProductCen = productCen,
             Status = OrderDetailStatus.Created,
             Note = note,
             Quantity = quantity,

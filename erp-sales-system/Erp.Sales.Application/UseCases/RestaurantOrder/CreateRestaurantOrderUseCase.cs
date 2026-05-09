@@ -12,7 +12,8 @@ public class CreateRestaurantOrderUseCase(IRestaurantOrderRepository restaurantO
 
         var restaurantOrder = Domain.Entities.RestaurantOrder.Create(
             taxPrice: globalTax,
-            companyId: createRestaurantOrderDto.CompanyId
+            companyId: createRestaurantOrderDto.CompanyId,
+            companyCen: createRestaurantOrderDto.CompanyCen
         );
         
        return await restaurantOrderRepository.CreateAsync(restaurantOrder);

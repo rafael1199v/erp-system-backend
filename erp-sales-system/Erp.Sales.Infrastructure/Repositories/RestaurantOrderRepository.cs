@@ -79,6 +79,7 @@ public class RestaurantOrderRepository(SalesDbContext salesDbContext) : IRestaur
             var orderModel = new OrderModel
             {
                 CompanyId = restaurantOrder.CompanyId,
+                CompanyCen = restaurantOrder.CompanyCen,
                 TaxPrice = restaurantOrder.TaxPrice,
                 CustomerId = restaurantOrder.CustomerId,
                 DailyNumber = maxTicketNumber + 1,

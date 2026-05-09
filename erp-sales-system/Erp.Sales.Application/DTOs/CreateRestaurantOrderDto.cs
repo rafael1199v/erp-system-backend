@@ -3,5 +3,6 @@ namespace Erp.Sales.Application.DTOs;
 public record CreateRestaurantOrderDto(
     int? CustomerId,
     int? WaiterId,
-    int CompanyId
+    int CompanyId,
+    string? CompanyCen = null
 );
