@@ -63,7 +63,7 @@ public class TaxConfigurationRepository(SalesDbContext salesDbContext) : ITaxCon
         else
         {
             taxConfigurationModel.GlobalTaxPercentage = globalTaxConfiguration.GlobalTaxPercentage;
-            taxConfigurationModel.CompanyCen = globalTaxConfiguration.CompanyCen;
+            taxConfigurationModel.CompanyCen = globalTaxConfiguration.CompanyCen ?? string.Empty;
             taxConfigurationModel.IsDeleted = false;
         }
 
@@ -75,7 +75,7 @@ public class TaxConfigurationRepository(SalesDbContext salesDbContext) : ITaxCon
         return new TaxConfigurationModel
         {
             CompanyId = globalTaxConfiguration.CompanyId,
-            CompanyCen = globalTaxConfiguration.CompanyCen,
+            CompanyCen = globalTaxConfiguration.CompanyCen ?? string.Empty,
             GlobalTaxPercentage = globalTaxConfiguration.GlobalTaxPercentage
         };
     }

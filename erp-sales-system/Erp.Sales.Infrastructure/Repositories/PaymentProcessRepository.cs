@@ -30,11 +30,11 @@ public class PaymentProcessRepository(SalesDbContext salesDbContext) : IPaymentP
                 CustomerId = sale.CustomerId,
                 PaymentTypeId = sale.PaymentTypeId,
                 CompanyId = sale.CompanyId,
-                CompanyCen = sale.CompanyCen,
+                CompanyCen = sale.CompanyCen ?? string.Empty,
                 SaleDetails = sale.SaleDetails.Select(detail => new SaleDetailModel
                 {
                     ProductId = detail.ProductId,
-                    ProductCen = detail.ProductCen,
+                    ProductCen = detail.ProductCen ?? string.Empty,
                     Price = detail.Price,
                     Quantity = detail.Quantity
                 }).ToList()

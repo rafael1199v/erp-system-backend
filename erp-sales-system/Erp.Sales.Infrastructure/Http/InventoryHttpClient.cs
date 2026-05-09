@@ -6,6 +6,18 @@ namespace Erp.Sales.Infrastructure.Http;
 
 public class InventoryHttpClient(HttpClient http) : IInventoryService
 {
+    public async Task<CompanyLookupContractDto?> GetCompanyByCenAsync(string companyCen)
+    {
+        var response = await http.GetAsync($"/api/inventory/companies/{Encode(companyCen)}");
+        if (response.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+
+        response.EnsureSuccessStatusCode();
+        return await ReadRequiredAsync<CompanyLookupContractDto>(response, "Invalid company lookup contract response");
+    }
+
     public async Task<bool> IsProductActiveAsync(int productId, int companyId)
     {
         var response = await http.GetAsync($"/api/inventory/product/{productId}/is-active/{companyId}");

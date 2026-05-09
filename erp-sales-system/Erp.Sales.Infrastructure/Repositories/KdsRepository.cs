@@ -64,8 +64,8 @@ public class KdsRepository(SalesDbContext salesDbContext) : IKdsRepository
 
         var categoryCens = await Queryable
             .Where<TeamConfigurationModel>(salesDbContext.TeamConfigurations
-                .AsNoTracking(), tc => tc.CompanyId == companyId && tc.TeamId == teamId && tc.CategoryCen != null)
-            .Select(tc => tc.CategoryCen!)
+                .AsNoTracking(), tc => tc.CompanyId == companyId && tc.TeamId == teamId && tc.CategoryCen != string.Empty)
+            .Select(tc => tc.CategoryCen)
             .Distinct()
             .ToListAsync();
 

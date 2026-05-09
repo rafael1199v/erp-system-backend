@@ -25,6 +25,8 @@ public static class SalesModule
     public static IServiceCollection AddSalesModule(this IServiceCollection services, IConfiguration configuration)
     {
         QuestPDF.Settings.License = LicenseType.Community;
+
+        services.AddMemoryCache();
         
         services.AddControllers().AddApplicationPart(typeof(TaxController).Assembly);
         services.AddControllers().AddApplicationPart(typeof(OrderController).Assembly);

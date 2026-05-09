@@ -1,10 +1,17 @@
+using Erp.Inventory.Contracts;
 using Erp.Sales.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Erp.Sales.Infrastructure.Services;
 
-public class SalesCenResolver(SalesDbContext context) : ISalesCenResolver
+public class SalesCenResolver(
+    SalesDbContext context,
+    IInventoryService inventoryService,
+    IMemoryCache cache) : ISalesCenResolver
 {
+    private static readonly TimeSpan CompanyCacheDuration = TimeSpan.FromMinutes(30);
+
     public async Task<int?> ResolveCompanyIdAsync(string companyCen)
     {
         string normalizedCompanyCen = Normalize(companyCen);
@@ -13,6 +20,43 @@ public class SalesCenResolver(SalesDbContext context) : ISalesCenResolver
             return null;
         }
 
+        string cacheKey = GetCompanyCacheKey(normalizedCompanyCen);
+        if (cache.TryGetValue(cacheKey, out int cachedCompanyId))
+        {
+            return cachedCompanyId;
+        }
+
+        int? inventoryCompanyId = await ResolveCompanyIdFromInventoryAsync(normalizedCompanyCen);
+        if (inventoryCompanyId is not null)
+        {
+            cache.Set(cacheKey, inventoryCompanyId.Value, CompanyCacheDuration);
+            return inventoryCompanyId;
+        }
+
+        int? salesCompanyId = await ResolveCompanyIdFromSalesAsync(normalizedCompanyCen);
+        if (salesCompanyId is not null)
+        {
+            cache.Set(cacheKey, salesCompanyId.Value, CompanyCacheDuration);
+        }
+
+        return salesCompanyId;
+    }
+
+    private async Task<int?> ResolveCompanyIdFromInventoryAsync(string normalizedCompanyCen)
+    {
+        try
+        {
+            CompanyLookupContractDto? company = await inventoryService.GetCompanyByCenAsync(normalizedCompanyCen);
+            return company?.CompanyId;
+        }
+        catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException or InvalidOperationException)
+        {
+            return null;
+        }
+    }
+
+    private async Task<int?> ResolveCompanyIdFromSalesAsync(string normalizedCompanyCen)
+    {
         return await context.Orders
                    .AsNoTracking()
                    .Where(order => order.CompanyCen == normalizedCompanyCen && !order.IsDeleted)
@@ -60,6 +104,8 @@ public class SalesCenResolver(SalesDbContext context) : ISalesCenResolver
         string normalizedCompanyCen = Normalize(companyCen);
         string normalizedTicketCen = Normalize(ticketCen);
 
+        int CompanyId = await ResolveCompanyIdAsync(companyCen) ?? throw new Exception("The company could not be found");
+
         return await context.RestaurantOrders
             .AsNoTracking()
             .Where(ticket =>
@@ -79,6 +125,8 @@ public class SalesCenResolver(SalesDbContext context) : ISalesCenResolver
         string normalizedCompanyCen = Normalize(companyCen);
         string normalizedTicketCen = Normalize(ticketCen);
         string normalizedTicketItemCen = Normalize(ticketItemCen);
+        
+        int CompanyId = await ResolveCompanyIdAsync(companyCen) ?? throw new Exception("The company could not be found");
 
         return await context.RestaurantOrderDetails
             .AsNoTracking()
@@ -98,6 +146,8 @@ public class SalesCenResolver(SalesDbContext context) : ISalesCenResolver
         string normalizedCompanyCen = Normalize(companyCen);
         string normalizedWaiterCen = Normalize(waiterCen);
 
+        int CompanyId = await ResolveCompanyIdAsync(companyCen) ?? throw new Exception("The company could not be found");
+        
         return await context.Waiters
             .AsNoTracking()
             .Where(waiter =>
@@ -112,6 +162,8 @@ public class SalesCenResolver(SalesDbContext context) : ISalesCenResolver
     {
         string normalizedCompanyCen = Normalize(companyCen);
         string normalizedTeamCen = Normalize(teamCen);
+        
+        int CompanyId = await ResolveCompanyIdAsync(companyCen) ?? throw new Exception("The company could not be found");
 
         return await context.Teams
             .AsNoTracking()
@@ -127,6 +179,8 @@ public class SalesCenResolver(SalesDbContext context) : ISalesCenResolver
     {
         string normalizedCompanyCen = Normalize(companyCen);
         string normalizedSaleCen = Normalize(saleCen);
+        
+        int CompanyId = await ResolveCompanyIdAsync(companyCen) ?? throw new Exception("The company could not be found");
 
         return await context.Sales
             .AsNoTracking()
@@ -142,6 +196,8 @@ public class SalesCenResolver(SalesDbContext context) : ISalesCenResolver
     {
         string normalizedCompanyCen = Normalize(companyCen);
         string normalizedWarehouseCen = Normalize(warehouseCen);
+        
+        int CompanyId = await ResolveCompanyIdAsync(companyCen) ?? throw new Exception("The company could not be found");
 
         return await context.WarehouseConfigurations
             .AsNoTracking()
@@ -156,5 +212,10 @@ public class SalesCenResolver(SalesDbContext context) : ISalesCenResolver
     private static string Normalize(string value)
     {
         return value.Trim();
+    }
+
+    private static string GetCompanyCacheKey(string normalizedCompanyCen)
+    {
+        return $"sales:company-cen:{normalizedCompanyCen}";
     }
 }

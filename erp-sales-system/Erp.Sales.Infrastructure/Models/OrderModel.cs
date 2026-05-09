@@ -18,7 +18,7 @@ public class OrderModel
     public CustomerModel? Customer { get; set; }
 
     public int CompanyId { get; set; }
-    public string? CompanyCen { get; set; }
+    public string CompanyCen { get; set; } = string.Empty;
     public decimal TaxPrice { get; set; }
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

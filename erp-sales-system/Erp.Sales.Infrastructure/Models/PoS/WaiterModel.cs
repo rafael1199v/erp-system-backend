@@ -9,7 +9,7 @@ public class WaiterModel
     public string Cen { get; set; } = Guid.NewGuid().ToString();
     public string Name { get; set; } = string.Empty;
     public int CompanyId { get; set; }
-    public string? CompanyCen { get; set; }
+    public string CompanyCen { get; set; } = string.Empty;
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public bool IsDeleted { get; set; } = false;

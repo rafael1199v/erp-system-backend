@@ -20,7 +20,7 @@ public class SaleModel
     public PaymentTypeModel PaymentType { get; set; } = null!;
     
     public int CompanyId { get; set; }
-    public string? CompanyCen { get; set; }
+    public string CompanyCen { get; set; } = string.Empty;
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public bool IsDeleted { get; set; } = false;

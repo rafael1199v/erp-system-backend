@@ -109,7 +109,7 @@ public class RestaurantOrderDetailRepository(SalesDbContext salesDbContext) : IR
 				: restaurantOrderDetail.Cen,
 			RestaurantOrderId = restaurantOrderDetail.RestaurantOrderId,
 			ProductId = restaurantOrderDetail.ProductId,
-			ProductCen = restaurantOrderDetail.ProductCen,
+			ProductCen = restaurantOrderDetail.ProductCen ?? string.Empty,
 			RestaurantOrderDetailStatusId = (int)restaurantOrderDetail.Status,
 			Note = restaurantOrderDetail.Note,
 			Quantity = restaurantOrderDetail.Quantity,
