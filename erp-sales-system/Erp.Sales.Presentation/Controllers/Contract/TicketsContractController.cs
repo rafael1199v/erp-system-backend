@@ -19,6 +19,9 @@ public class TicketsContractController(
     IResendOrderDetailUseCase resendOrderDetailUseCase,
     ISendOrderUseCase sendOrderUseCase,
     IAssignWaiterUseCase assignWaiterUseCase,
+    ICancelRestaurantOrderUseCase cancelRestaurantOrderUseCase,
+    IPrintRestaurantOrderUseCase printRestaurantOrderUseCase,
+    IGetTicketTotalsUseCase getTicketTotalsUseCase,
     IRestaurantOrderRepository restaurantOrderRepository,
     IRestaurantOrderDetailRepository restaurantOrderDetailRepository,
     IInventoryService inventoryService)
@@ -190,6 +193,105 @@ public class TicketsContractController(
 
         List<RestaurantOrderDetail> details = await restaurantOrderDetailRepository.GetByRestaurantOrderIdAsync(ticket.Id);
         return Ok(await ToTicketItemResponsesAsync(companyCen, details));
+    }
+
+    [HttpPut("{ticketCen}/waiter")]
+    public async Task<IActionResult> AssignTicketWaiter(
+        string companyCen,
+        string ticketCen,
+        [FromBody] AssignTicketWaiterContractRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.WaiterCen))
+        {
+            return BadRequest(new { message = "waiterCen es requerido" });
+        }
+
+        SalesCenLookup? ticket = await salesCenResolver.ResolveTicketAsync(companyCen, ticketCen);
+        if (ticket is null)
+        {
+            return NotFound(new { message = "Ticket no encontrado" });
+        }
+
+        SalesCenLookup? waiter = await salesCenResolver.ResolveWaiterAsync(companyCen, request.WaiterCen);
+        if (waiter is null)
+        {
+            return NotFound(new { message = "Mesero no encontrado" });
+        }
+
+        await assignWaiterUseCase.ExecuteAsync(new AssignWaiterDto(ticket.Id, waiter.Id));
+
+        return Ok(new AssignTicketWaiterContractResponse
+        {
+            TicketCen = ticket.Cen,
+            WaiterCen = waiter.Cen,
+            WaiterName = waiter.Name ?? string.Empty
+        });
+    }
+
+    [HttpPost("{ticketCen}/cancel")]
+    public async Task<IActionResult> CancelTicket(
+        string companyCen,
+        string ticketCen,
+        [FromBody] CancelTicketContractRequest? request)
+    {
+        SalesCenLookup? ticket = await salesCenResolver.ResolveTicketAsync(companyCen, ticketCen);
+        if (ticket is null)
+        {
+            return NotFound(new { message = "Ticket no encontrado" });
+        }
+
+        try
+        {
+            await cancelRestaurantOrderUseCase.ExecuteAsync(new CancelRestaurantOrderDto(ticket.Id));
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+
+        return Ok(new CancelTicketContractResponse
+        {
+            TicketCen = ticket.Cen
+        });
+    }
+
+    [HttpGet("{ticketCen}/print")]
+    public async Task<IActionResult> PrintTicket(string companyCen, string ticketCen)
+    {
+        SalesCenLookup? ticket = await salesCenResolver.ResolveTicketAsync(companyCen, ticketCen);
+        if (ticket is null)
+        {
+            return NotFound(new { message = "Ticket no encontrado" });
+        }
+
+        byte[] pdfBytes = await printRestaurantOrderUseCase.ExecuteAsync(ticket.Id);
+        return File(pdfBytes, "application/pdf", $"ticket-{ticket.Cen}.pdf");
+    }
+
+    [HttpGet("{ticketCen}/totals")]
+    public async Task<IActionResult> GetTicketTotals(string companyCen, string ticketCen)
+    {
+        SalesCenLookup? ticket = await salesCenResolver.ResolveTicketAsync(companyCen, ticketCen);
+        if (ticket is null)
+        {
+            return NotFound(new { message = "Ticket no encontrado" });
+        }
+
+        try
+        {
+            TicketTotalsDto totals = await getTicketTotalsUseCase.ExecuteAsync(ticket.Id);
+            return Ok(new TicketTotalsContractResponse
+            {
+                TicketCen = ticket.Cen,
+                Subtotal = totals.Subtotal,
+                TaxAmount = totals.TaxAmount,
+                Total = totals.Total
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
     }
 
     private static TicketContractResponse ToTicketResponse(RestaurantOrder ticket)

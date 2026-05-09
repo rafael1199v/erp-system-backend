@@ -1,4 +1,5 @@
 using Erp.Sales.Application.Interfaces;
+using Erp.Sales.Application.Services;
 using Erp.Sales.Domain.Entities;
 using Erp.Sales.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,7 @@ public class PaymentTypeRepository(SalesDbContext salesDbContext) : IPaymentType
 
     public async Task<int?> ResolveIdByCodeAsync(string paymentMethodCode)
     {
-        string normalizedCode = NormalizePaymentMethodCode(paymentMethodCode);
+        string normalizedCode = PaymentMethodCodeNormalizer.Normalize(paymentMethodCode);
         if (int.TryParse(normalizedCode, out int paymentTypeId)
             && await ExistsAsync(paymentTypeId))
         {
@@ -29,7 +30,7 @@ public class PaymentTypeRepository(SalesDbContext salesDbContext) : IPaymentType
             .ToListAsync();
 
         return paymentTypes
-            .Where(paymentType => NormalizePaymentMethodCode(paymentType.Name) == normalizedCode)
+            .Where(paymentType => PaymentMethodCodeNormalizer.Normalize(paymentType.Name) == normalizedCode)
             .Select(paymentType => (int?)paymentType.Id)
             .FirstOrDefault();
     }
@@ -47,12 +48,4 @@ public class PaymentTypeRepository(SalesDbContext salesDbContext) : IPaymentType
             .ToListAsync();
     }
 
-    private static string NormalizePaymentMethodCode(string value)
-    {
-        return value
-            .Trim()
-            .Replace(" ", "_")
-            .Replace("-", "_")
-            .ToUpperInvariant();
-    }
 }

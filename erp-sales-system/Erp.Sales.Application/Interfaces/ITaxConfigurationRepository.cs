@@ -7,4 +7,6 @@ public interface ITaxConfigurationRepository
     Task CreateGlobalTaxAsync(GlobalTaxConfiguration globalTaxConfiguration);
     Task UpdateGlobalTaxAsync(GlobalTaxConfiguration globalTaxConfiguration);
     Task<GlobalTaxConfiguration> GetGlobalTaxAsync(int companyId);
+    Task<GlobalTaxConfiguration?> FindGlobalTaxAsync(int companyId);
+    Task UpsertGlobalTaxAsync(GlobalTaxConfiguration globalTaxConfiguration);
 }
