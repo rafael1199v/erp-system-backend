@@ -1,6 +1,7 @@
 using Erp.Inventory.Application.DTOs;
 using Erp.Inventory.Application.Interfaces;
 using Erp.Inventory.Application.UseCases.Product;
+using Erp.Inventory.Contracts;
 using Erp.Inventory.Presentation.ContractDtos;
 
 namespace Erp.Inventory.Presentation.ContractAdapters;

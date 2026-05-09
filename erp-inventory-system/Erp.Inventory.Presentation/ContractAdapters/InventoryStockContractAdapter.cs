@@ -4,7 +4,6 @@ using Erp.Inventory.Application.UseCases.Movement;
 using Erp.Inventory.Application.UseCases.Product;
 using Erp.Inventory.Contracts;
 using Erp.Inventory.Domain.Enums;
-using Erp.Inventory.Presentation.ContractDtos;
 
 namespace Erp.Inventory.Presentation.ContractAdapters;
 

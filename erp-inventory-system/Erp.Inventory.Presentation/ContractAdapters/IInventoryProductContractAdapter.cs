@@ -1,3 +1,4 @@
+using Erp.Inventory.Contracts;
 using Erp.Inventory.Presentation.ContractDtos;
 
 namespace Erp.Inventory.Presentation.ContractAdapters;

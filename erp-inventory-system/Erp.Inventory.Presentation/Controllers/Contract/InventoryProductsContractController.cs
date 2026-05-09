@@ -1,3 +1,4 @@
+using Erp.Inventory.Contracts;
 using Erp.Inventory.Presentation.ContractAdapters;
 using Erp.Inventory.Presentation.ContractDtos;
 using Microsoft.AspNetCore.Mvc;
