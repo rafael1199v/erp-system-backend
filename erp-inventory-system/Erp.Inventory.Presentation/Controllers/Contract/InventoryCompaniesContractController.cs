@@ -12,4 +12,10 @@ public class InventoryCompaniesContractController(IInventoryCatalogContractAdapt
     {
         return Ok(await catalogAdapter.GetCompaniesAsync());
     }
+
+    [HttpGet("{companyCen}")]
+    public async Task<IActionResult> GetCompany(string companyCen)
+    {
+        return ToActionResult(await catalogAdapter.GetCompanyByCenAsync(companyCen));
+    }
 }

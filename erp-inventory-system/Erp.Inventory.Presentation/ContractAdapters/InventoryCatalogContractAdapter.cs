@@ -4,6 +4,7 @@ using Erp.Inventory.Application.UseCases.Category;
 using Erp.Inventory.Application.UseCases.Company;
 using Erp.Inventory.Application.UseCases.Unit;
 using Erp.Inventory.Application.UseCases.Warehouse;
+using Erp.Inventory.Contracts;
 using Erp.Inventory.Presentation.ContractDtos;
 
 namespace Erp.Inventory.Presentation.ContractAdapters;
@@ -24,6 +25,22 @@ public class InventoryCatalogContractAdapter(
     {
         List<GetCompanyDTO> companies = await getCompaniesUseCase.ExecuteAsync();
         return companies.Select(mapper.ToCompanyContract).ToList();
+    }
+
+    public async Task<InventoryContractResult<CompanyLookupContractDto>> GetCompanyByCenAsync(string companyCen)
+    {
+        CenLookup? company = await cenResolver.ResolveCompanyAsync(companyCen);
+        if (company is null)
+        {
+            return InventoryContractResult<CompanyLookupContractDto>.NotFound("Empresa no encontrada");
+        }
+
+        return InventoryContractResult<CompanyLookupContractDto>.Ok(new CompanyLookupContractDto
+        {
+            CompanyId = company.Id,
+            CompanyCen = company.Cen,
+            Name = company.Name
+        });
     }
 
     public async Task<InventoryContractResult<List<CategoryContractDto>>> GetCategoriesAsync(string companyCen)
