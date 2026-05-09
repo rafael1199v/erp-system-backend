@@ -56,4 +56,39 @@ public class DashboardRepository(SalesDbContext salesDbContext) : IDashboardRepo
 
         return [.. Enumerable.Select(topProducts, tp => (tp.ProductId, tp.TotalQuantity))];
     }
+
+    public async Task<List<(int ProductId, string? ProductCen, int TotalQuantity)>> GetTopSoldProductReferencesAsync(
+        int companyId,
+        DateTime fromUtc,
+        DateTime toUtc,
+        int topN)
+    {
+        var topProducts = await Queryable
+            .Where<SaleModel>(salesDbContext.Sales
+                .AsNoTracking(), s =>
+                !s.IsDeleted &&
+                s.CompanyId == companyId &&
+                s.SaleDatetime >= fromUtc &&
+                s.SaleDatetime < toUtc)
+            .SelectMany(s => s.SaleDetails
+                .Where(sd => !sd.IsDeleted)
+                .Select(sd => new
+                {
+                    sd.ProductId,
+                    sd.ProductCen,
+                    sd.Quantity
+                }))
+            .GroupBy(sd => new { sd.ProductId, sd.ProductCen })
+            .Select(g => new
+            {
+                g.Key.ProductId,
+                g.Key.ProductCen,
+                TotalQuantity = g.Sum(x => x.Quantity)
+            })
+            .OrderByDescending(x => x.TotalQuantity)
+            .Take(topN)
+            .ToListAsync();
+
+        return [.. topProducts.Select(tp => (tp.ProductId, tp.ProductCen, tp.TotalQuantity))];
+    }
 }
