@@ -130,6 +130,29 @@ public class InventoryHttpClient(HttpClient http) : IInventoryService
         return await ReadRequiredAsync<StockConsumeContractResponse>(response, "Invalid stock consume contract response");
     }
 
+    public async Task<List<SellableProductContractDto>> GetSellableProductsAsync(
+        string companyCen,
+        string? search = null,
+        string? categoryCen = null,
+        string? warehouseCen = null,
+        bool onlyAvailable = true,
+        int page = 1,
+        int pageSize = 50)
+    {
+        string endpoint = $"/api/inventory/companies/{Encode(companyCen)}/sellable-products"
+                          + BuildQuery(
+                              ("search", search),
+                              ("categoryCen", categoryCen),
+                              ("warehouseCen", warehouseCen),
+                              ("onlyAvailable", onlyAvailable.ToString().ToLowerInvariant()),
+                              ("page", page.ToString()),
+                              ("pageSize", pageSize.ToString()));
+
+        var response = await http.GetAsync(endpoint);
+        response.EnsureSuccessStatusCode();
+        return await ReadRequiredAsync<List<SellableProductContractDto>>(response, "Invalid sellable product contract response");
+    }
+
     private static async Task<T> ReadRequiredAsync<T>(HttpResponseMessage response, string errorMessage)
     {
         return await response.Content.ReadFromJsonAsync<T>()

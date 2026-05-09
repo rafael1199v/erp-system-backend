@@ -30,8 +30,13 @@ public class CreateRestaurantOrderDetailUseCase(
         string? warehouseCen = Normalize(await warehouseConfigurationRepository
             .GetWarehouseCenByCompanyIdAsync(restaurantOrder.CompanyId));
 
-        if (CanUseCenInventory(companyCen, productCen, warehouseCen))
+        if (productCen is not null)
         {
+            if (!CanUseCenInventory(companyCen, productCen, warehouseCen))
+            {
+                throw new InvalidOperationException("No hay datos CEN suficientes para validar el producto");
+            }
+
             await ValidateProductWithCenContractAsync(
                 companyCen!,
                 productCen!,
@@ -40,6 +45,11 @@ public class CreateRestaurantOrderDetailUseCase(
         }
         else
         {
+            if (createRestaurantOrderDetail.ProductId <= 0)
+            {
+                throw new InvalidOperationException("El producto es requerido");
+            }
+
             await ValidateProductWithLegacyContractAsync(createRestaurantOrderDetail, restaurantOrder.CompanyId);
         }
 

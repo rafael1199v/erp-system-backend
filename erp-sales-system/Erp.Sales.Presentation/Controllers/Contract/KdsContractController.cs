@@ -105,24 +105,14 @@ public class KdsContractController(
         List<ProductContractDto> contractProducts = await inventoryService.GetProductsAsync(companyCen);
         var productsByCen = contractProducts.ToDictionary(product => product.ProductCen, StringComparer.OrdinalIgnoreCase);
 
-        var legacyProductsById = new Dictionary<int, RestaurantOrderDetailProductDto>();
-        if (team.CategoryCens.Count == 0 && team.CategoryIds.Count > 0)
-        {
-            List<int> productIds = orderItems.Select(item => item.ProductId).Distinct().ToList();
-            legacyProductsById = (await inventoryService.GetOrderDetailProductsByIdsAsync(productIds))
-                .ToDictionary(product => product.ProductId);
-        }
-
         HashSet<string> teamCategoryCens = team.CategoryCens.ToHashSet(StringComparer.OrdinalIgnoreCase);
-        HashSet<int> teamCategoryIds = team.CategoryIds.ToHashSet();
 
         return orderItems
             .Select(item =>
             {
                 productsByCen.TryGetValue(item.ProductCen ?? string.Empty, out ProductContractDto? product);
-                legacyProductsById.TryGetValue(item.ProductId, out RestaurantOrderDetailProductDto? legacyProduct);
 
-                bool belongsToTeam = ProductBelongsToTeam(product, legacyProduct, teamCategoryCens, teamCategoryIds);
+                bool belongsToTeam = ProductBelongsToTeam(product, teamCategoryCens);
                 if (!belongsToTeam)
                 {
                     return null;
@@ -133,7 +123,7 @@ public class KdsContractController(
                     TicketItemCen = item.TicketItemCen,
                     TicketCen = item.TicketCen,
                     ProductCen = item.ProductCen ?? product?.ProductCen ?? string.Empty,
-                    ProductName = product?.Name ?? legacyProduct?.Name ?? $"Producto {item.ProductId}",
+                    ProductName = product?.Name ?? "Producto sin CEN",
                     Quantity = item.Quantity,
                     Status = ToContractStatus(item.RestaurantOrderDetailStatus),
                     Note = item.Note,
@@ -148,18 +138,14 @@ public class KdsContractController(
 
     private static bool ProductBelongsToTeam(
         ProductContractDto? product,
-        RestaurantOrderDetailProductDto? legacyProduct,
-        HashSet<string> teamCategoryCens,
-        HashSet<int> teamCategoryIds)
+        HashSet<string> teamCategoryCens)
     {
         if (teamCategoryCens.Count > 0)
         {
             return product is not null && teamCategoryCens.Contains(product.CategoryCen);
         }
 
-        return teamCategoryIds.Count > 0
-               && legacyProduct is not null
-               && teamCategoryIds.Contains(legacyProduct.CategoryId);
+        return false;
     }
 
     private static bool TryParseStatus(string value, out OrderDetailStatus status)

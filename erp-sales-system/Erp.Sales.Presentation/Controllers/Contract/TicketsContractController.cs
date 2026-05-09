@@ -108,11 +108,6 @@ public class TicketsContractController(
             return NotFound(new { message = "Ticket no encontrado" });
         }
 
-        if (request.ProductId <= 0)
-        {
-            return BadRequest(new { message = "productId es requerido temporalmente para crear items desde la ruta CEN" });
-        }
-
         if (string.IsNullOrWhiteSpace(request.ProductCen))
         {
             return BadRequest(new { message = "productCen es requerido" });
@@ -120,7 +115,6 @@ public class TicketsContractController(
 
         int ticketItemId = await createRestaurantOrderDetailUseCase.ExecuteAsync(new CreateRestaurantOrderDetail(
             RestaurantOrderId: ticket.Id,
-            ProductId: request.ProductId,
             Note: request.Note,
             Quantity: request.Quantity,
             CreatedAt: null,
@@ -330,7 +324,7 @@ public class TicketsContractController(
             {
                 TicketItemCen = detail.Cen,
                 ProductCen = detail.ProductCen ?? string.Empty,
-                ProductName = product?.Name ?? $"Producto {detail.ProductId}",
+                ProductName = product?.Name ?? "Producto sin CEN",
                 Quantity = detail.Quantity,
                 UnitPrice = product?.SalePrice ?? 0,
                 Note = detail.Note,

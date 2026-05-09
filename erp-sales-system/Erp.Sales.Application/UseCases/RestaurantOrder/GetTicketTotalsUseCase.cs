@@ -26,15 +26,21 @@ public class GetTicketTotalsUseCase(
             return new TicketTotalsDto(0, restaurantOrder.Order.TaxPrice, restaurantOrder.Order.TaxPrice);
         }
 
-        Dictionary<int, decimal> productPriceById = CanUseCenInventory(restaurantOrder.CompanyCen, chargeableDetails)
-            ? await GetProductPricesByIdFromCenContractAsync(restaurantOrder.CompanyCen!, chargeableDetails)
-            : await GetProductPricesByIdFromLegacyContractAsync(chargeableDetails);
+        if (!CanUseCenInventory(restaurantOrder.CompanyCen, chargeableDetails))
+        {
+            throw new InvalidOperationException("No hay datos CEN suficientes para calcular totales");
+        }
+
+        Dictionary<string, decimal> productPriceByCen = await GetProductPricesByCenFromContractAsync(
+            restaurantOrder.CompanyCen!,
+            chargeableDetails);
 
         decimal subtotal = chargeableDetails.Sum(detail =>
         {
-            if (!productPriceById.TryGetValue(detail.ProductId, out decimal price))
+            string productCen = detail.ProductCen!;
+            if (!productPriceByCen.TryGetValue(productCen, out decimal price))
             {
-                throw new InvalidOperationException($"No se pudo obtener el precio del producto {detail.ProductId}");
+                throw new InvalidOperationException($"No se pudo obtener el precio del producto {productCen}");
             }
 
             return price * detail.Quantity;
@@ -44,7 +50,7 @@ public class GetTicketTotalsUseCase(
         return new TicketTotalsDto(subtotal, taxAmount, subtotal + taxAmount);
     }
 
-    private async Task<Dictionary<int, decimal>> GetProductPricesByIdFromCenContractAsync(
+    private async Task<Dictionary<string, decimal>> GetProductPricesByCenFromContractAsync(
         string companyCen,
         List<RestaurantOrderDetail> chargeableDetails)
     {
@@ -53,7 +59,7 @@ public class GetTicketTotalsUseCase(
             product => product.ProductCen,
             StringComparer.OrdinalIgnoreCase);
 
-        Dictionary<int, decimal> productPriceById = new();
+        Dictionary<string, decimal> productPriceByCen = new(StringComparer.OrdinalIgnoreCase);
         foreach (RestaurantOrderDetail detail in chargeableDetails)
         {
             if (!productsByCen.TryGetValue(detail.ProductCen!, out ProductContractDto? product))
@@ -61,22 +67,10 @@ public class GetTicketTotalsUseCase(
                 throw new InvalidOperationException($"No se pudo obtener el precio del producto {detail.ProductCen}");
             }
 
-            productPriceById[detail.ProductId] = product.SalePrice;
+            productPriceByCen[detail.ProductCen!] = product.SalePrice;
         }
 
-        return productPriceById;
-    }
-
-    private async Task<Dictionary<int, decimal>> GetProductPricesByIdFromLegacyContractAsync(
-        List<RestaurantOrderDetail> chargeableDetails)
-    {
-        List<int> productIds = chargeableDetails
-            .Select(detail => detail.ProductId)
-            .Distinct()
-            .ToList();
-
-        List<RestaurantOrderDetailProductDto> products = await inventoryService.GetOrderDetailProductsByIdsAsync(productIds);
-        return products.ToDictionary(product => product.ProductId, product => Convert.ToDecimal(product.SellPrice));
+        return productPriceByCen;
     }
 
     private static bool CanUseCenInventory(
