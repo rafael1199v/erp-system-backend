@@ -24,6 +24,15 @@ public class KdsRepository(SalesDbContext salesDbContext) : IKdsRepository
             .GroupBy<TeamConfigurationModel, int>(categoryRows, tc => tc.TeamId)
             .ToDictionary(g => g.Key, g => g.Select(tc => tc.CategoryId).Distinct().ToList());
 
+        var categoryCenMap = Enumerable
+            .GroupBy<TeamConfigurationModel, int>(categoryRows, tc => tc.TeamId)
+            .ToDictionary(g => g.Key, g => g
+                .Select(tc => tc.CategoryCen)
+                .Where(cen => !string.IsNullOrWhiteSpace(cen))
+                .Select(cen => cen!)
+                .Distinct()
+                .ToList());
+
         return [.. teamModels
             .Select(t => new KdsTeam
             {
@@ -31,7 +40,7 @@ public class KdsRepository(SalesDbContext salesDbContext) : IKdsRepository
                 Cen = t.Cen,
                 Name = t.Name,
                 CategoryIds = categoryMap.GetValueOrDefault(t.Id, []),
-                CategoryCens = []
+                CategoryCens = categoryCenMap.GetValueOrDefault(t.Id, [])
             })];
     }
 
@@ -53,12 +62,20 @@ public class KdsRepository(SalesDbContext salesDbContext) : IKdsRepository
             .Distinct()
             .ToListAsync();
 
+        var categoryCens = await Queryable
+            .Where<TeamConfigurationModel>(salesDbContext.TeamConfigurations
+                .AsNoTracking(), tc => tc.CompanyId == companyId && tc.TeamId == teamId && tc.CategoryCen != null)
+            .Select(tc => tc.CategoryCen!)
+            .Distinct()
+            .ToListAsync();
+
         return new KdsTeam
         {
             Id = teamModel.Id,
             Cen = teamModel.Cen,
             Name = teamModel.Name,
-            CategoryIds = categoryIds
+            CategoryIds = categoryIds,
+            CategoryCens = categoryCens
         };
     }
 

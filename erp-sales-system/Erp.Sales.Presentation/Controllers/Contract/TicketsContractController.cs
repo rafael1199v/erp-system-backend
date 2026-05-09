@@ -2,6 +2,7 @@ using Erp.Inventory.Contracts;
 using Erp.Sales.Application.DTOs;
 using Erp.Sales.Application.Interfaces;
 using Erp.Sales.Application.UseCases.RestaurantOrder;
+using Erp.Sales.Application.UseCases.RestaurantOrderDetails;
 using Erp.Sales.Domain.Entities;
 using Erp.Sales.Presentation.ContractDtos;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,9 @@ public class TicketsContractController(
     ISalesCenResolver salesCenResolver,
     ICreateRestaurantOrderUseCase createRestaurantOrderUseCase,
     ICreateRestaurantOrderDetailUseCase createRestaurantOrderDetailUseCase,
+    IUpdateRestaurantOrderDetailQuantityUseCase updateRestaurantOrderDetailQuantityUseCase,
+    IResendOrderDetailUseCase resendOrderDetailUseCase,
+    ISendOrderUseCase sendOrderUseCase,
     IAssignWaiterUseCase assignWaiterUseCase,
     IRestaurantOrderRepository restaurantOrderRepository,
     IRestaurantOrderDetailRepository restaurantOrderDetailRepository,
@@ -128,6 +132,64 @@ public class TicketsContractController(
         return Created(
             $"/api/sales/companies/{Uri.EscapeDataString(companyCen)}/tickets/{Uri.EscapeDataString(ticketCen)}/items/{Uri.EscapeDataString(itemCen)}",
             response.First());
+    }
+
+    [HttpPatch("{ticketCen}/items/{ticketItemCen}")]
+    public async Task<IActionResult> UpdateTicketItem(
+        string companyCen,
+        string ticketCen,
+        string ticketItemCen,
+        [FromBody] UpdateTicketItemContractRequest request)
+    {
+        SalesCenLookup? item = await salesCenResolver.ResolveTicketItemAsync(companyCen, ticketCen, ticketItemCen);
+        if (item is null)
+        {
+            return NotFound(new { message = "Item de ticket no encontrado" });
+        }
+
+        await updateRestaurantOrderDetailQuantityUseCase.ExecuteAsync(new UpdateRestaurantOrderDetailQuantityDto(
+            RestaurantOrderDetailId: item.Id,
+            Quantity: request.Quantity,
+            Note: request.Note));
+
+        RestaurantOrderDetail updatedItem = await restaurantOrderDetailRepository.GetByIdAsync(item.Id)
+                                            ?? throw new InvalidOperationException("No se pudo recuperar el item actualizado");
+
+        List<TicketItemContractResponse> response = await ToTicketItemResponsesAsync(companyCen, [updatedItem]);
+        return Ok(response.First());
+    }
+
+    [HttpPost("{ticketCen}/items/{ticketItemCen}/resend")]
+    public async Task<IActionResult> ResendTicketItem(string companyCen, string ticketCen, string ticketItemCen)
+    {
+        SalesCenLookup? item = await salesCenResolver.ResolveTicketItemAsync(companyCen, ticketCen, ticketItemCen);
+        if (item is null)
+        {
+            return NotFound(new { message = "Item de ticket no encontrado" });
+        }
+
+        await resendOrderDetailUseCase.ExecuteAsync(item.Id);
+
+        RestaurantOrderDetail updatedItem = await restaurantOrderDetailRepository.GetByIdAsync(item.Id)
+                                            ?? throw new InvalidOperationException("No se pudo recuperar el item reenviado");
+
+        List<TicketItemContractResponse> response = await ToTicketItemResponsesAsync(companyCen, [updatedItem]);
+        return Ok(response.First());
+    }
+
+    [HttpPost("{ticketCen}/send")]
+    public async Task<IActionResult> SendTicket(string companyCen, string ticketCen)
+    {
+        SalesCenLookup? ticket = await salesCenResolver.ResolveTicketAsync(companyCen, ticketCen);
+        if (ticket is null)
+        {
+            return NotFound(new { message = "Ticket no encontrado" });
+        }
+
+        await sendOrderUseCase.ExecuteAsync(ticket.Id);
+
+        List<RestaurantOrderDetail> details = await restaurantOrderDetailRepository.GetByRestaurantOrderIdAsync(ticket.Id);
+        return Ok(await ToTicketItemResponsesAsync(companyCen, details));
     }
 
     private static TicketContractResponse ToTicketResponse(RestaurantOrder ticket)

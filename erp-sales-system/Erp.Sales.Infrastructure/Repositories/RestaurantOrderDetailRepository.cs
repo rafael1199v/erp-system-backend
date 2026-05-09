@@ -38,6 +38,25 @@ public class RestaurantOrderDetailRepository(SalesDbContext salesDbContext) : IR
 		return model is null ? null : ToDomain(model);
 	}
 
+	public async Task<RestaurantOrderDetail?> GetByCompanyAndCenAsync(string companyCen, string ticketItemCen)
+	{
+		var normalizedCompanyCen = companyCen.Trim();
+		var normalizedTicketItemCen = ticketItemCen.Trim();
+
+		var model = await salesDbContext.RestaurantOrderDetails
+			.AsNoTracking()
+			.Include(rod => rod.RestaurantOrder)
+			.ThenInclude(restaurantOrder => restaurantOrder.Order)
+			.FirstOrDefaultAsync(rod =>
+				rod.Cen == normalizedTicketItemCen &&
+				!rod.IsDeleted &&
+				!rod.RestaurantOrder.IsDeleted &&
+				!rod.RestaurantOrder.Order.IsDeleted &&
+				rod.RestaurantOrder.Order.CompanyCen == normalizedCompanyCen);
+
+		return model is null ? null : ToDomain(model);
+	}
+
 	public async Task UpdateQuantityAsync(int restaurantOrderDetailId, int quantity, string? note)
 	{
         var model = await Queryable
