@@ -1,0 +1,63 @@
+using Erp.Sales.Application.DTOs;
+using Erp.Sales.Application.Interfaces;
+using Erp.Sales.Application.UseCases.RestaurantOrder;
+using Erp.Sales.Presentation.ContractDtos;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Erp.Sales.Presentation.Controllers.Contract;
+
+[ApiController]
+[Route("api/sales/companies/{companyCen}/tickets/{ticketCen}/payment")]
+public class TicketPaymentsContractController(
+    ISalesCenResolver salesCenResolver,
+    IPaymentTypeRepository paymentTypeRepository,
+    IProcessRestaurantOrderPaymentUseCase processRestaurantOrderPaymentUseCase)
+    : ControllerBase
+{
+    [HttpPost]
+    public async Task<IActionResult> PayTicket(
+        string companyCen,
+        string ticketCen,
+        [FromBody] PayTicketContractRequest request)
+    {
+        SalesCenLookup? ticket = await salesCenResolver.ResolveTicketAsync(companyCen, ticketCen);
+        if (ticket is null)
+        {
+            return NotFound(new { message = "Ticket no encontrado" });
+        }
+
+        if (string.IsNullOrWhiteSpace(request.PaymentMethodCode))
+        {
+            return BadRequest(new { message = "paymentMethodCode es requerido" });
+        }
+
+        int? paymentTypeId = await paymentTypeRepository.ResolveIdByCodeAsync(request.PaymentMethodCode);
+        if (paymentTypeId is null)
+        {
+            return BadRequest(new { message = "Metodo de pago no valido" });
+        }
+
+        ProcessRestaurantOrderPaymentResultDto result = await processRestaurantOrderPaymentUseCase.ExecuteAsync(
+            new ProcessRestaurantOrderPaymentDto
+            {
+                RestaurantOrderId = ticket.Id,
+                PaymentTypeId = paymentTypeId.Value
+            });
+
+        if (!result.IsSuccess)
+        {
+            return Conflict(result);
+        }
+
+        return Ok(new PayTicketContractResponse
+        {
+            SaleCen = result.SaleCen ?? string.Empty,
+            TicketCen = ticket.Cen,
+            Status = "Paid",
+            Subtotal = result.Subtotal,
+            TaxAmount = result.TaxAmount,
+            Total = result.Total,
+            InventoryDocumentCen = result.InventoryDocumentCen
+        });
+    }
+}

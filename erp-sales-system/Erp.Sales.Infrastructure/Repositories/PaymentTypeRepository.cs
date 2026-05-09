@@ -13,6 +13,27 @@ public class PaymentTypeRepository(SalesDbContext salesDbContext) : IPaymentType
             .AnyAsync(pt => pt.Id == paymentTypeId && !pt.IsDeleted);
     }
 
+    public async Task<int?> ResolveIdByCodeAsync(string paymentMethodCode)
+    {
+        string normalizedCode = NormalizePaymentMethodCode(paymentMethodCode);
+        if (int.TryParse(normalizedCode, out int paymentTypeId)
+            && await ExistsAsync(paymentTypeId))
+        {
+            return paymentTypeId;
+        }
+
+        var paymentTypes = await salesDbContext.PaymentTypes
+            .AsNoTracking()
+            .Where(pt => !pt.IsDeleted)
+            .Select(pt => new { pt.Id, pt.Name })
+            .ToListAsync();
+
+        return paymentTypes
+            .Where(paymentType => NormalizePaymentMethodCode(paymentType.Name) == normalizedCode)
+            .Select(paymentType => (int?)paymentType.Id)
+            .FirstOrDefault();
+    }
+
     public async Task<List<PaymentTypeOption>> GetAllAsync()
     {
         return await Queryable
@@ -24,5 +45,14 @@ public class PaymentTypeRepository(SalesDbContext salesDbContext) : IPaymentType
                 Name = pt.Name
             })
             .ToListAsync();
+    }
+
+    private static string NormalizePaymentMethodCode(string value)
+    {
+        return value
+            .Trim()
+            .Replace(" ", "_")
+            .Replace("-", "_")
+            .ToUpperInvariant();
     }
 }

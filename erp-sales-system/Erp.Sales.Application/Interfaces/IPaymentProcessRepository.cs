@@ -4,5 +4,5 @@ namespace Erp.Sales.Application.Interfaces;
 
 public interface IPaymentProcessRepository
 {
-    Task<int> CreateSaleAndCloseOrderAsync(int restaurantOrderId, Sale sale);
+    Task<SalesCenLookup> CreateSaleAndCloseOrderAsync(int restaurantOrderId, Sale sale);
 }

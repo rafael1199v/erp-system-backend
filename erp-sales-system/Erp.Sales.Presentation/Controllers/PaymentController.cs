@@ -37,6 +37,7 @@ public class PaymentController(
             return Ok(new
             {
                 saleId = result.SaleId,
+                saleCen = result.SaleCen,
                 inventoryDocumentCen = result.InventoryDocumentCen
             });
         }

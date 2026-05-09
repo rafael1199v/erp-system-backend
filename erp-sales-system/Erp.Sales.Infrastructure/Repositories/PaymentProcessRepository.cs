@@ -9,7 +9,7 @@ namespace Erp.Sales.Infrastructure.Repositories;
 
 public class PaymentProcessRepository(SalesDbContext salesDbContext) : IPaymentProcessRepository
 {
-    public async Task<int> CreateSaleAndCloseOrderAsync(int restaurantOrderId, Sale sale)
+    public async Task<SalesCenLookup> CreateSaleAndCloseOrderAsync(int restaurantOrderId, Sale sale)
     {
         await using var transaction = await salesDbContext.Database.BeginTransactionAsync();
 
@@ -46,7 +46,7 @@ public class PaymentProcessRepository(SalesDbContext salesDbContext) : IPaymentP
             await salesDbContext.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            return saleModel.Id;
+            return new SalesCenLookup(saleModel.Id, saleModel.Cen);
         }
         catch
         {

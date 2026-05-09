@@ -156,9 +156,16 @@ public class ProcessRestaurantOrderPaymentUseCase(
             SaleDetails = saleDetails
         };
 
-        var saleId = await paymentProcessRepository.CreateSaleAndCloseOrderAsync(processRestaurantOrderPaymentDto.RestaurantOrderId, sale);
+        var createdSale = await paymentProcessRepository.CreateSaleAndCloseOrderAsync(
+            processRestaurantOrderPaymentDto.RestaurantOrderId,
+            sale);
 
-        return ProcessRestaurantOrderPaymentResultDto.Success(saleId, inventoryDocumentCen);
+        return ProcessRestaurantOrderPaymentResultDto.Success(
+            createdSale.Id,
+            createdSale.Cen,
+            subtotalPrice,
+            restaurantOrder.Order.TaxPrice,
+            inventoryDocumentCen);
     }
 
     private static StockValidationContractRequest CreateStockValidationRequest(
