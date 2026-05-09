@@ -8,6 +8,11 @@ public interface IInventoryService
     Task<List<RestaurantOrderDetailProductDto>> GetOrderDetailProductsByIdsAsync(List<int> productIds);
     Task<StockValidationResultDto> ValidateStockAvailabilityAsync(List<StockRequirementDto> requirements, int companyId);
     Task ExecutePaymentStockDiscountAsync(CreatePaymentStockDiscountDto createPaymentStockDiscountDto);
+    Task<CompanyLookupContractDto?> GetCompanyByCenAsync(string companyCen)
+    {
+        throw new NotSupportedException("CEN company contract access is not implemented by this inventory service.");
+    }
+
     Task<List<ProductContractDto>> GetProductsAsync(
         string companyCen,
         string? search = null,
