@@ -114,6 +114,7 @@ public class InventoryContractMapper : IInventoryContractMapper
             DocumentCen = movement.Cen,
             DocumentType = documentType ?? ToContractDocumentType(movement.MovementType, movement.ExternalReference),
             Status = ToContractMovementStatus(movement.MovementStatus),
+            Title = movement.Title,
             CreatedAt = ToDateTime(movement.MovementDate),
             TotalItems = movement.Transactions.Count,
             GeneratedMovementCens = movement.Transactions

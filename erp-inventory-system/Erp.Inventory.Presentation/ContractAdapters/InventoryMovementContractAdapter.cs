@@ -65,7 +65,7 @@ public class InventoryMovementContractAdapter(
             return InventoryContractResult<InventoryDocumentContractDto>.Ok(
                 mapper.ToInventoryDocumentContract(movement, normalizedDocumentType));
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex)
         {
             return InventoryContractResult<InventoryDocumentContractDto>.Invalid(ex.Message);
         }
