@@ -9,6 +9,7 @@ namespace Erp.Inventory.Presentation.ContractAdapters;
 public class InventoryProductContractAdapter(
     IInventoryCenResolver cenResolver,
     IInventoryContractMapper mapper,
+    IProductRepository productRepository,
     IGetProductCatalogUseCase getProductCatalogUseCase,
     ICreateOwnProductUseCase createOwnProductUseCase,
     IUpdateOwnProductUseCase updateOwnProductUseCase,
@@ -237,5 +238,44 @@ public class InventoryProductContractAdapter(
             };
 
         return InventoryContractResult<ProductContractDto>.Ok(updatedProduct);
+    }
+
+    public async Task<InventoryContractResult<List<SellableProductContractDto>>> GetSellableProductsAsync(
+        string companyCen,
+        string? search,
+        string? categoryCen,
+        string? warehouseCen,
+        bool onlyAvailable,
+        int page,
+        int pageSize)
+    {
+        CenLookup? company = await cenResolver.ResolveCompanyAsync(companyCen);
+        if (company is null)
+        {
+            return InventoryContractResult<List<SellableProductContractDto>>.NotFound("Empresa no encontrada");
+        }
+
+        if (!string.IsNullOrWhiteSpace(categoryCen)
+            && await cenResolver.ResolveCategoryAsync(company.Id, categoryCen) is null)
+        {
+            return InventoryContractResult<List<SellableProductContractDto>>.NotFound("Categoria no encontrada");
+        }
+
+        if (!string.IsNullOrWhiteSpace(warehouseCen)
+            && await cenResolver.ResolveWarehouseAsync(company.Id, warehouseCen) is null)
+        {
+            return InventoryContractResult<List<SellableProductContractDto>>.NotFound("Almacen no encontrado");
+        }
+
+        List<SellableProductContractDto> products = await productRepository.GetSellableProductsAsync(
+            company.Id,
+            search,
+            categoryCen,
+            warehouseCen,
+            onlyAvailable,
+            page,
+            pageSize);
+
+        return InventoryContractResult<List<SellableProductContractDto>>.Ok(products);
     }
 }

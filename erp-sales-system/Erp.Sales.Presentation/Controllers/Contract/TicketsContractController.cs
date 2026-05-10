@@ -297,7 +297,8 @@ public class TicketsContractController(
             Status = ticket.Order.Status.ToString(),
             CreatedAt = ticket.OrderDatetime.ToString("o"),
             CompanyCen = ticket.CompanyCen,
-            TaxAmount = ticket.TaxPrice
+            TaxAmount = ticket.TaxPrice,
+            WaiterCen = ticket.WaiterCen,
         };
     }
 

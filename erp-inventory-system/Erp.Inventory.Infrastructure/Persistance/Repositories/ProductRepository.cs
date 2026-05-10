@@ -152,7 +152,7 @@ public class ProductRepository : IProductRepository
 
             return product.Id;
         }
-        catch (Exception ex)
+        catch
         {
             await transaction.RollbackAsync();
             throw new Exception("Hubo un error al crear el producto");
@@ -333,6 +333,84 @@ public class ProductRepository : IProductRepository
                 CategoryId = p.CategoryId,
                 Name = p.CoreProduct.Name,
                 SellPrice = (double)p.SellPrice,
+            })
+            .ToListAsync();
+    }
+
+    public async Task<List<SellableProductContractDto>> GetSellableProductsAsync(
+        int companyId,
+        string? search,
+        string? categoryCen,
+        string? warehouseCen,
+        bool onlyAvailable,
+        int page,
+        int pageSize)
+    {
+        int normalizedPage = Math.Max(page, 1);
+        int normalizedPageSize = Math.Clamp(pageSize, 1, 100);
+        string? normalizedSearch = string.IsNullOrWhiteSpace(search) ? null : search.Trim().ToLower();
+        string? normalizedCategoryCen = string.IsNullOrWhiteSpace(categoryCen) ? null : categoryCen.Trim();
+        string? normalizedWarehouseCen = string.IsNullOrWhiteSpace(warehouseCen) ? null : warehouseCen.Trim();
+
+        var products = _context.Products
+            .AsNoTracking()
+            .Where(product =>
+                product.CompanyId == companyId &&
+                !product.IsDeleted &&
+                product.IsActive &&
+                product.ProductStatusId == (int)Domain.Enums.ProductStatus.Available);
+
+        if (normalizedSearch is not null)
+        {
+            products = products.Where(product =>
+                product.CoreProduct.Name.ToLower().Contains(normalizedSearch) ||
+                product.Cen.ToLower().Contains(normalizedSearch) ||
+                (product.Sku != null && product.Sku.ToLower().Contains(normalizedSearch)));
+        }
+
+        if (normalizedCategoryCen is not null)
+        {
+            products = products.Where(product => product.Category.Cen == normalizedCategoryCen);
+        }
+
+        var sellableProducts = products
+            .Select(product => new
+            {
+                product.Cen,
+                product.CoreProduct.Name,
+                CategoryCen = product.Category.Cen,
+                CategoryName = product.Category.Name,
+                product.SellPrice,
+                AvailableQuantity = product.ProductWarehouses
+                    .Where(stock =>
+                        !stock.IsDeleted &&
+                        stock.Warehouse.CompanyId == companyId &&
+                        !stock.Warehouse.IsDeleted &&
+                        (normalizedWarehouseCen == null || stock.Warehouse.Cen == normalizedWarehouseCen))
+                    .Sum(stock => (int?)stock.Quantity) ?? 0,
+                product.StationCode
+            });
+
+        if (onlyAvailable)
+        {
+            sellableProducts = sellableProducts.Where(product => product.AvailableQuantity > 0);
+        }
+
+        return await sellableProducts
+            .OrderBy(product => product.Name)
+            .ThenBy(product => product.Cen)
+            .Skip((normalizedPage - 1) * normalizedPageSize)
+            .Take(normalizedPageSize)
+            .Select(product => new SellableProductContractDto
+            {
+                ProductCen = product.Cen,
+                Name = product.Name,
+                CategoryCen = product.CategoryCen,
+                CategoryName = product.CategoryName,
+                SalePrice = product.SellPrice,
+                AvailableQuantity = product.AvailableQuantity,
+                IsAvailable = product.AvailableQuantity > 0,
+                StationCode = product.StationCode
             })
             .ToListAsync();
     }

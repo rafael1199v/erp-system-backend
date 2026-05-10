@@ -43,4 +43,16 @@ public interface IInventoryService
     {
         throw new NotSupportedException("CEN stock consume is not implemented by this inventory service.");
     }
+
+    Task<List<SellableProductContractDto>> GetSellableProductsAsync(
+        string companyCen,
+        string? search = null,
+        string? categoryCen = null,
+        string? warehouseCen = null,
+        bool onlyAvailable = true,
+        int page = 1,
+        int pageSize = 50)
+    {
+        throw new NotSupportedException("CEN sellable product access is not implemented by this inventory service.");
+    }
 }

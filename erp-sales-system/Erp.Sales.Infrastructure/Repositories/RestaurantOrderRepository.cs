@@ -117,6 +117,7 @@ public class RestaurantOrderRepository(SalesDbContext salesDbContext) : IRestaur
                 or.Order.CompanyId == companyId
                 && or.Order.OrderDatetime >= dayStartUtc
                 && or.Order.OrderDatetime < nextDayStartUtc)
+            .Include(or => or.Waiter)
             .ToListAsync();
         
         return Enumerable.ToList(restaurantOrders.Select(ToDomain));
@@ -157,6 +158,7 @@ public class RestaurantOrderRepository(SalesDbContext salesDbContext) : IRestaur
             CompanyId = model.Order.CompanyId,
             CompanyCen = model.Order.CompanyCen,
             CustomerId = model.Order.CustomerId,
+            WaiterCen = model.Waiter?.Cen,
             WaiterId = model.WaiterId,
             OrderDatetime = model.Order.OrderDatetime,
             Order = new Order

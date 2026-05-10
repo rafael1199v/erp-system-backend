@@ -16,6 +16,8 @@ public class RestaurantOrder
     public required DateTime OrderDatetime { get; set; }
     
     public int? WaiterId { get; set; }
+    
+    public string? WaiterCen { get; set; }
 
     public int? CustomerId { get; set; }
     

@@ -47,7 +47,8 @@ public class GetTicketTotalsUseCase(
         });
 
         decimal taxAmount = restaurantOrder.Order.TaxPrice;
-        return new TicketTotalsDto(subtotal, taxAmount, subtotal + taxAmount);
+        decimal total = (1 + taxAmount / 100) * subtotal;
+        return new TicketTotalsDto(subtotal, taxAmount, total);
     }
 
     private async Task<Dictionary<string, decimal>> GetProductPricesByCenFromContractAsync(

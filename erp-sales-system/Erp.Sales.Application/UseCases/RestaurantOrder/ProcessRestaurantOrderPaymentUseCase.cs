@@ -49,7 +49,6 @@ public class ProcessRestaurantOrderPaymentUseCase(
         }
 
         string? inventoryDocumentCen = null;
-        Dictionary<string, decimal> productPriceByCen;
 
         if (!CanUseCenInventory(companyCen, warehouseCen, chargeableDetails))
         {
@@ -77,7 +76,7 @@ public class ProcessRestaurantOrderPaymentUseCase(
         }
 
         inventoryDocumentCen = stockConsumeResult.DocumentCen;
-        productPriceByCen = await GetProductPricesByCenFromContractAsync(companyCen!, chargeableDetails);
+        var productPriceByCen = await GetProductPricesByCenFromContractAsync(companyCen!, chargeableDetails);
 
         var saleDetails = new List<SaleDetail>();
         foreach (var detail in chargeableDetails)
