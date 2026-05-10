@@ -1,9 +1,12 @@
+using Erp.Purchasing.Presentation;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 const string allowSpecificOrigins = "AllowSpecificOrigins";
 
 builder.Services.AddControllers();
+builder.Services.AddPurchasingModule(builder.Configuration);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 

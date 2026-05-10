@@ -1,15 +1,33 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Erp.Purchasing.Application.Exceptions;
+using Erp.Purchasing.Application.UseCases;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Erp.Purchasing.Presentation.Controllers;
 
 [ApiController]
 [Route("api/purchases/companies/{companyCen}/suppliers")]
-public class SupplierController : ControllerBase
+public class SupplierController(IGetSuppliersUseCase getSuppliersUseCase) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetSuppliers(string companyCen)
+    public async Task<IActionResult> GetSuppliers(string companyCen, CancellationToken ct = default)
     {
-        return Ok();
-    }   
+        try
+        {
+            return Ok(await getSuppliersUseCase.ExecuteAsync(companyCen, ct));
+        }
+        catch (Exception ex)
+        {
+            return ToErrorResult(ex);
+        }
+    }
+
+    private IActionResult ToErrorResult(Exception exception)
+    {
+        return exception switch
+        {
+            PurchasingBusinessException => BadRequest(new { message = exception.Message }),
+            InvalidOperationException => BadRequest(new { message = exception.Message }),
+            _ => BadRequest(new { message = exception.Message })
+        };
+    }
 }
