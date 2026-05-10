@@ -200,31 +200,71 @@ public class InventoryStockContractAdapter(
 
     public async Task<InventoryContractResult<string>> IncreaseStockAsync(string companyCen, StockIncreaseContractRequest request)
     {
-        CenLookup company = (await cenResolver.ResolveCompanyAsync(companyCen))!;
-      
-        string movementDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
-        ResolvedStockRequest resolvedRequest = (await ResolveStockRequestAsync(company.Id, request.WarehouseCen, request.Items))!;
-
-        InventoryMovementDTO movement = await createMovementUseCase.ExecuteAsync(new CreateInventoryMovementDTO
+        try
         {
-            Title = $"Entrada por compra {request.ReferenceCen}",
-            ExternalReference = $"PURCHASE:{request.ReferenceCen}",
-            MovementDate = movementDate,
-            MovementType = (int)MovementTypeEnum.Receipt,
-            MovementStatus = (int)MovementStatusEnum.Completed,
-            CompanyId = company.Id,
-            Transactions = resolvedRequest.Requirements.Select(requirement => new CreateTransactionDTO
+            if (request is null)
             {
-                ProductId = requirement.ProductId,
-                WarehouseId = requirement.WarehouseId,
-                Quantity = requirement.RequestedQuantity,
-                Reason = request.Reason ?? $"Compra realizada {request.ReferenceCen}",
-                TransactionDate = movementDate,
-                TransactionType = (int)TransactionTypeEnum.In
-            }).ToList()
-        });
+                return InventoryContractResult<string>.Invalid("La solicitud de incremento de stock es requerida");
+            }
 
-        return InventoryContractResult<string>.Ok(movement.Cen);
+            if (string.IsNullOrWhiteSpace(request.WarehouseCen))
+            {
+                return InventoryContractResult<string>.Invalid("El CEN del almacen es requerido");
+            }
+
+            if (string.IsNullOrWhiteSpace(request.ReferenceCen))
+            {
+                return InventoryContractResult<string>.Invalid("El CEN de referencia es requerido");
+            }
+
+            if (request.Items.Count == 0)
+            {
+                return InventoryContractResult<string>.Invalid("La solicitud debe tener al menos un item");
+            }
+
+            if (request.Items.Any(item => string.IsNullOrWhiteSpace(item.ProductCen) || item.Quantity <= 0))
+            {
+                return InventoryContractResult<string>.Invalid("Cada item debe tener productCen y quantity mayor a cero");
+            }
+
+            CenLookup? company = await cenResolver.ResolveCompanyAsync(companyCen);
+            if (company is null)
+            {
+                return InventoryContractResult<string>.NotFound("Empresa no encontrada");
+            }
+      
+            string movementDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
+            ResolvedStockRequest? resolvedRequest = await ResolveStockRequestAsync(company.Id, request.WarehouseCen, request.Items);
+            if (resolvedRequest is null)
+            {
+                return InventoryContractResult<string>.NotFound("Producto o almacen no encontrado");
+            }
+
+            InventoryMovementDTO movement = await createMovementUseCase.ExecuteAsync(new CreateInventoryMovementDTO
+            {
+                Title = $"Entrada por compra {request.ReferenceCen}",
+                ExternalReference = $"PURCHASE:{request.ReferenceCen}",
+                MovementDate = movementDate,
+                MovementType = (int)MovementTypeEnum.Receipt,
+                MovementStatus = (int)MovementStatusEnum.Completed,
+                CompanyId = company.Id,
+                Transactions = resolvedRequest.Requirements.Select(requirement => new CreateTransactionDTO
+                {
+                    ProductId = requirement.ProductId,
+                    WarehouseId = requirement.WarehouseId,
+                    Quantity = requirement.RequestedQuantity,
+                    Reason = request.Reason ?? $"Compra realizada {request.ReferenceCen}",
+                    TransactionDate = movementDate,
+                    TransactionType = (int)TransactionTypeEnum.In
+                }).ToList()
+            });
+
+            return InventoryContractResult<string>.Ok(movement.Cen);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return InventoryContractResult<string>.Invalid(ex.Message);
+        }
     }
 
 

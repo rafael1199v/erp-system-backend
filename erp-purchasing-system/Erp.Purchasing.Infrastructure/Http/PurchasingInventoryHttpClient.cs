@@ -10,7 +10,7 @@ public class PurchasingInventoryHttpClient(HttpClient http) : IPurchasingInvento
     public async Task ConfirmStockIncreaseAsync(
         string companyCen,
         string warehouseCen,
-        string purchaseOrdenCen,
+        string purchaseOrderCen,
         IReadOnlyCollection<PurchaseOrderDetailItemDto> items,
         CancellationToken ct = default)
     {
@@ -18,8 +18,8 @@ public class PurchasingInventoryHttpClient(HttpClient http) : IPurchasingInvento
         {
             WarehouseCen = warehouseCen,
             Source = "PURCHASES",
-            ReferenceCen = purchaseOrdenCen,
-            Reason = $"Registro de la compra {purchaseOrdenCen}",
+            ReferenceCen = purchaseOrderCen,
+            Reason = $"Registro de la compra {purchaseOrderCen}",
             Items = items.Select(item => new StockValidationItemContractDto
             {
                 ProductCen = item.ProductCen,
