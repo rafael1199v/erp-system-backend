@@ -65,6 +65,7 @@ public static class SalesModule
         services.AddScoped<IResendOrderDetailUseCase, ResendOrderDetailUseCase>();
         services.AddScoped<IPdfService, PdfService>();
         services.AddScoped<IPrintRestaurantOrderUseCase, PrintRestaurantOrderUseCase>();
+        services.AddScoped<IPrintTicketContractUseCase, PrintTicketContractUseCase>();
         services.AddScoped<IGetPaymentTypesUseCase, GetPaymentTypesUseCase>();
         services.AddScoped<IProcessRestaurantOrderPaymentUseCase, ProcessRestaurantOrderPaymentUseCase>();
         services.AddScoped<IGetDailySalesDashboardUseCase, GetDailySalesDashboardUseCase>();

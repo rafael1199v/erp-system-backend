@@ -22,6 +22,13 @@ public interface IInventoryService
         throw new NotSupportedException("CEN product contract access is not implemented by this inventory service.");
     }
 
+    Task<List<ProductContractDto>> GetProductsByCensAsync(
+        string companyCen,
+        IEnumerable<string> productCens)
+    {
+        throw new NotSupportedException("CEN product lookup contract access is not implemented by this inventory service.");
+    }
+
     Task<List<StockItemContractDto>> GetStockAsync(
         string companyCen,
         string? productCen = null,

@@ -55,6 +55,36 @@ public class InventoryProductContractAdapter(
         return InventoryContractResult<List<ProductContractDto>>.Ok(contractProducts.ToList());
     }
 
+    public async Task<InventoryContractResult<List<ProductContractDto>>> LookupProductsAsync(
+        string companyCen,
+        ProductLookupContractRequest request)
+    {
+        CenLookup? company = await cenResolver.ResolveCompanyAsync(companyCen);
+        if (company is null)
+        {
+            return InventoryContractResult<List<ProductContractDto>>.NotFound("Empresa no encontrada");
+        }
+
+        List<string> productCens = (request.ProductCens ?? [])
+            .Select(productCen => productCen.Trim())
+            .Where(productCen => !string.IsNullOrWhiteSpace(productCen))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (productCens.Count > 100)
+        {
+            return InventoryContractResult<List<ProductContractDto>>.Invalid("No se pueden consultar mas de 100 productos por lookup");
+        }
+
+        if (productCens.Count == 0)
+        {
+            return InventoryContractResult<List<ProductContractDto>>.Ok([]);
+        }
+
+        List<GetProductCatalogDTO> products = await productRepository.GetProductsByCensAsync(company.Id, productCens);
+        return InventoryContractResult<List<ProductContractDto>>.Ok(products.Select(mapper.ToProductContract).ToList());
+    }
+
     public async Task<InventoryContractResult<CreateProductContractResponse>> CreateProductAsync(string companyCen, CreateProductContractRequest request)
     {
         CenLookup? company = await cenResolver.ResolveCompanyAsync(companyCen);

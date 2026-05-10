@@ -20,7 +20,7 @@ public class TicketsContractController(
     ISendOrderUseCase sendOrderUseCase,
     IAssignWaiterUseCase assignWaiterUseCase,
     ICancelRestaurantOrderUseCase cancelRestaurantOrderUseCase,
-    IPrintRestaurantOrderUseCase printRestaurantOrderUseCase,
+    IPrintTicketContractUseCase printTicketContractUseCase,
     IGetTicketTotalsUseCase getTicketTotalsUseCase,
     IRestaurantOrderRepository restaurantOrderRepository,
     IRestaurantOrderDetailRepository restaurantOrderDetailRepository,
@@ -252,14 +252,19 @@ public class TicketsContractController(
     [HttpGet("{ticketCen}/print")]
     public async Task<IActionResult> PrintTicket(string companyCen, string ticketCen)
     {
-        SalesCenLookup? ticket = await salesCenResolver.ResolveTicketAsync(companyCen, ticketCen);
-        if (ticket is null)
+        try
         {
-            return NotFound(new { message = "Ticket no encontrado" });
+            byte[] pdfBytes = await printTicketContractUseCase.ExecuteAsync(companyCen, ticketCen);
+            return File(pdfBytes, "application/pdf", $"ticket-{ticketCen}.pdf");
         }
-
-        byte[] pdfBytes = await printRestaurantOrderUseCase.ExecuteAsync(ticket.Id);
-        return File(pdfBytes, "application/pdf", $"ticket-{ticket.Cen}.pdf");
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
     }
 
     [HttpGet("{ticketCen}/totals")]

@@ -10,6 +10,9 @@ public interface IInventoryProductContractAdapter
         string? search = null,
         string? categoryCen = null,
         string? status = null);
+    Task<InventoryContractResult<List<ProductContractDto>>> LookupProductsAsync(
+        string companyCen,
+        ProductLookupContractRequest request);
     Task<InventoryContractResult<CreateProductContractResponse>> CreateProductAsync(string companyCen, CreateProductContractRequest request);
     Task<InventoryContractResult<ProductContractDto>> UpdateProductAsync(string companyCen, string productCen, UpdateProductContractRequest request);
     Task<InventoryContractResult<ProductContractDto>> UpdateProductStatusAsync(string companyCen, string productCen, UpdateProductStatusContractRequest request);

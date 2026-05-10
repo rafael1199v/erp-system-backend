@@ -19,6 +19,14 @@ public class InventoryProductsContractController(IInventoryProductContractAdapte
         return ToActionResult(await productAdapter.GetProductsAsync(companyCen, search, categoryCen, status));
     }
 
+    [HttpPost("lookup")]
+    public async Task<IActionResult> LookupProducts(
+        string companyCen,
+        [FromBody] ProductLookupContractRequest request)
+    {
+        return ToActionResult(await productAdapter.LookupProductsAsync(companyCen, request));
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateProduct(string companyCen, [FromBody] CreateProductContractRequest request)
     {

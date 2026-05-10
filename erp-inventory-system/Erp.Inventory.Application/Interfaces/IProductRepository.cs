@@ -26,6 +26,8 @@ public interface IProductRepository
 
     Task<List<ProductInformationDto>> GetProductInformationAsync(int companyId, List<int> productIds);
 
+    Task<List<GetProductCatalogDTO>> GetProductsByCensAsync(int companyId, IEnumerable<string> productCens);
+
     Task<List<SellableProductContractDto>> GetSellableProductsAsync(
         int companyId,
         string? search,

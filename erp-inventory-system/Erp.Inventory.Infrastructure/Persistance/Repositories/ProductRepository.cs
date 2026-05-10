@@ -337,6 +337,54 @@ public class ProductRepository : IProductRepository
             .ToListAsync();
     }
 
+    public async Task<List<GetProductCatalogDTO>> GetProductsByCensAsync(int companyId, IEnumerable<string> productCens)
+    {
+        List<string> normalizedCens = productCens
+            .Select(productCen => productCen.Trim())
+            .Where(productCen => !string.IsNullOrWhiteSpace(productCen))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (normalizedCens.Count == 0)
+        {
+            return [];
+        }
+
+        return await _context.Products
+            .AsNoTracking()
+            .Where(product =>
+                product.CompanyId == companyId &&
+                !product.IsDeleted &&
+                (normalizedCens.Contains(product.Cen) ||
+                 (product.Sku != null && normalizedCens.Contains(product.Sku))))
+            .OrderBy(product => product.CoreProduct.Name)
+            .ThenBy(product => product.Cen)
+            .Select(product => new GetProductCatalogDTO
+            {
+                ProductId = product.Id,
+                ProductCen = product.Cen,
+                Sku = product.Sku,
+                ProductName = product.CoreProduct.Name,
+                Description = product.Description,
+                Unit = product.Unit.Name,
+                UnitCen = product.Unit.Cen,
+                CurrentCost = product.CurrentCost,
+                SellPrice = product.SellPrice,
+                ImageUrl = product.CoreProduct.ImageUrl,
+                CategoryId = product.CategoryId,
+                CategoryCen = product.Category.Cen,
+                CategoryName = product.Category.Name,
+                StatusCode = product.ProductStatusId,
+                TotalStock = product.ProductWarehouses
+                    .Where(stock => !stock.IsDeleted)
+                    .Sum(stock => (int?)stock.Quantity) ?? 0,
+                ReorderLevel = product.ReorderLevel,
+                StationCode = product.StationCode,
+                IsActive = product.IsActive
+            })
+            .ToListAsync();
+    }
+
     public async Task<List<SellableProductContractDto>> GetSellableProductsAsync(
         int companyId,
         string? search,

@@ -161,7 +161,7 @@ public class InventoryContractMapper : IInventoryContractMapper
         return (MovementTypeEnum)movementType switch
         {
             MovementTypeEnum.Receipt => "ENTRY",
-            MovementTypeEnum.Issue when IsSaleReference(externalReference) => "SALE_EXIT",
+            //MovementTypeEnum.Issue when IsSaleReference(externalReference) => "SALE_EXIT",
             MovementTypeEnum.Issue => "EXIT",
             MovementTypeEnum.Adjustment => "ADJUSTMENT",
             _ => "UNKNOWN"

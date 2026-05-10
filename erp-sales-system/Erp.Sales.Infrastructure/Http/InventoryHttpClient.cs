@@ -79,6 +79,21 @@ public class InventoryHttpClient(HttpClient http) : IInventoryService
         return await ReadRequiredAsync<List<ProductContractDto>>(response, "Invalid product contract response");
     }
 
+    public async Task<List<ProductContractDto>> GetProductsByCensAsync(
+        string companyCen,
+        IEnumerable<string> productCens)
+    {
+        var response = await http.PostAsJsonAsync(
+            $"/api/inventory/companies/{Encode(companyCen)}/products/lookup",
+            new ProductLookupContractRequest
+            {
+                ProductCens = productCens.ToList()
+            });
+
+        response.EnsureSuccessStatusCode();
+        return await ReadRequiredAsync<List<ProductContractDto>>(response, "Invalid product lookup contract response");
+    }
+
     public async Task<List<StockItemContractDto>> GetStockAsync(
         string companyCen,
         string? productCen = null,
