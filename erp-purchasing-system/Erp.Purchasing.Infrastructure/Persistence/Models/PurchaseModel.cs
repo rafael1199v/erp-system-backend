@@ -21,7 +21,7 @@ public class PurchaseModel : AuditableModel
     public SupplierModel Supplier { get; set; } = null!;
     
     [Column("purchase_date")]
-    public DateOnly PurchaseDate { get; set; }
+    public DateOnly? PurchaseDate { get; set; }
     
     [Column("company_cen")]
     public Guid CompanyCen { get; set; }
