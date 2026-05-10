@@ -40,7 +40,7 @@ public class ProductCompanyEntity
         return new ProductCompanyEntity
         {
             Id = 0,
-            Cen = string.IsNullOrWhiteSpace(sku) ? Guid.NewGuid().ToString() : sku,
+            Cen = Guid.NewGuid().ToString(),
             Sku = sku,
             Description = description,
             StationCode = stationCode,
