@@ -9,11 +9,21 @@
     <Project Path="erp-inventory-system/Erp.Inventory.Presentation/Erp.Inventory.Presentation.csproj" />
     <Project Path="erp-inventory-system/Inventory.API/Inventory.API.csproj" />
   </Folder>
+  <Folder Name="/erp-purchasing-system/">
+    <Project Path="erp-purchasing-system/Erp.Purchasing.Application/Erp.Purchasing.Application.csproj" />
+    <Project Path="erp-purchasing-system/Erp.Purchasing.Domain/Erp.Purchasing.Domain.csproj" />
+    <Project Path="erp-purchasing-system/Erp.Purchasing.Infrastructure/Erp.Purchasing.Infrastructure.csproj" />
+    <Project Path="erp-purchasing-system/Erp.Purchasing.Presentation/Erp.Purchasing.Presentation.csproj" />
+    <Project Path="erp-purchasing-system/Purchasing.API/Purchasing.API.csproj" />
+  </Folder>
   <Folder Name="/erp-sales-system/">
     <Project Path="erp-sales-system/Erp.Sales.Application/Erp.Sales.Application.csproj" />
     <Project Path="erp-sales-system/Erp.Sales.Domain/Erp.Sales.Domain.csproj" />
     <Project Path="erp-sales-system/Erp.Sales.Infrastructure/Erp.Sales.Infrastructure.csproj" />
     <Project Path="erp-sales-system/Erp.Sales.Presentation/Erp.Sales.Presentation.csproj" />
     <Project Path="erp-sales-system/Sales.API/Sales.API.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="compose.yaml" />
   </Folder>
 </Solution>

@@ -1,0 +1,7 @@
+﻿services:
+  purchasing.api:
+    image: purchasing.api
+    build:
+      context: .
+      dockerfile: Purchasing.API/Dockerfile
+
