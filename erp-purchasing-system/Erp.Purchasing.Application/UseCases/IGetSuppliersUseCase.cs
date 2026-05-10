@@ -1,6 +1,8 @@
-﻿namespace Erp.Purchasing.Application.UseCases;
+using Erp.Purchasing.Application.DTOs;
 
-public class IGetSuppliersUseCase
+namespace Erp.Purchasing.Application.UseCases;
+
+public interface IGetSuppliersUseCase
 {
-    
+    Task<IReadOnlyCollection<SupplierDto>> ExecuteAsync(string companyCen, CancellationToken ct = default);
 }
