@@ -31,9 +31,16 @@ public class InventoryStockContractController(
     {
         return ToActionResult(await stockAdapter.ConsumeStockAsync(companyCen, request));
     }
-
+    
+    [HttpPost("increase")]
+    public async Task<IActionResult> IncreaseStock(string companyCen, [FromBody] StockIncreaseContractRequest request)
+    {
+        return Created();
+    } 
+    
     [HttpPost("adjustments")]
-    public async Task<IActionResult> CreateAdjustment(string companyCen, [FromBody] InventoryAdjustmentContractRequest request)
+    public async Task<IActionResult> CreateAdjustment(string companyCen,
+        [FromBody] InventoryAdjustmentContractRequest request)
     {
         return ToCreatedResult(await movementAdapter.CreateAdjustmentAsync(companyCen, request));
     }
