@@ -8,6 +8,7 @@ public sealed record PurchaseOrderDetailDto(
     DateTime CreatedAt,
     DateTime? ConfirmedAt,
     string SupplierCen,
+    string WarehouseCen,
     IReadOnlyCollection<PurchaseOrderDetailItemDto> Items);
 
 public sealed record PurchaseOrderDetailItemDto(

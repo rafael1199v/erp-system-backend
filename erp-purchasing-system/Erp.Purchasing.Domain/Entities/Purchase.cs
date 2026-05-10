@@ -13,15 +13,17 @@ public class Purchase
     public int Id { get; private set; }
     public string Cen { get; private set; } = string.Empty;
     public string CompanyCen { get; private set; } = string.Empty;
+    public string WarehouseCen { get; private set; } = string.Empty;
     public int SupplierId { get; private set; }
     public PurchaseStatus Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? ConfirmedAt { get; private set; }
     public IReadOnlyCollection<PurchaseItem> Items => _items.AsReadOnly();
 
-    public static Purchase Create(string companyCen, int supplierId, IEnumerable<PurchaseItem> items)
+    public static Purchase Create(string companyCen, int supplierId, IEnumerable<PurchaseItem> items, string warehouseCen)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(companyCen);
+        ArgumentException.ThrowIfNullOrWhiteSpace(warehouseCen);
 
         var purchaseItems = items?.ToList() ?? throw new ArgumentNullException(nameof(items));
         if (purchaseItems.Count == 0)
@@ -35,7 +37,8 @@ public class Purchase
             CompanyCen = companyCen.Trim(),
             SupplierId = supplierId,
             Status = PurchaseStatus.Pending,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            WarehouseCen = warehouseCen.Trim()
         };
 
         purchase._items.AddRange(purchaseItems);
@@ -50,10 +53,12 @@ public class Purchase
         PurchaseStatus status,
         DateTime createdAt,
         DateTime? confirmedAt,
-        IEnumerable<PurchaseItem> items)
+        IEnumerable<PurchaseItem> items,
+        string warehouseCen)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(cen);
         ArgumentException.ThrowIfNullOrWhiteSpace(companyCen);
+        ArgumentException.ThrowIfNullOrWhiteSpace(warehouseCen);
 
         var purchase = new Purchase
         {
@@ -63,7 +68,8 @@ public class Purchase
             SupplierId = supplierId,
             Status = status,
             CreatedAt = createdAt,
-            ConfirmedAt = confirmedAt
+            ConfirmedAt = confirmedAt,
+            WarehouseCen = warehouseCen.Trim()
         };
 
         purchase._items.AddRange(items ?? Enumerable.Empty<PurchaseItem>());

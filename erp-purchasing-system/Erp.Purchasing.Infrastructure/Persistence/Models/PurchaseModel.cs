@@ -28,6 +28,9 @@ public class PurchaseModel : AuditableModel
     
     [Column("company_cen")]
     public Guid CompanyCen { get; set; }
+
+    [Column("warehouse_cen")]
+    public Guid WarehouseCen { get; set; }
     
     public ICollection<PurchaseItemModel> PurchaseItems { get; set; } = new List<PurchaseItemModel>();
 }

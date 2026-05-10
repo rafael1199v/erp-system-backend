@@ -128,6 +128,7 @@ public class PurchaseRepository(PurchasingDbContext context) : IPurchaseReposito
                 purchase.CreatedAt,
                 purchase.ConfirmedAt,
                 purchase.Supplier.Cen.ToString(),
+                purchase.WarehouseCen.ToString(),
                 purchase.PurchaseItems
                     .Select(item => new PurchaseOrderDetailItemDto(
                         item.ProductCen.ToString(),
@@ -146,6 +147,7 @@ public class PurchaseRepository(PurchasingDbContext context) : IPurchaseReposito
             PurchaseStatus = purchase.Status,
             CreatedAt = purchase.CreatedAt,
             ConfirmedAt = purchase.ConfirmedAt,
+            WarehouseCen = Guid.Parse(purchase.WarehouseCen),
             PurchaseItems = purchase.Items.Select(item => new PurchaseItemModel
             {
                 ProductCen = Guid.Parse(item.ProductCen),
@@ -171,6 +173,7 @@ public class PurchaseRepository(PurchasingDbContext context) : IPurchaseReposito
                 item.Id,
                 item.ProductCen.ToString(),
                 item.Quantity,
-                item.PurchaseId)));
+                item.PurchaseId)),
+            model.WarehouseCen.ToString());
     }
 }

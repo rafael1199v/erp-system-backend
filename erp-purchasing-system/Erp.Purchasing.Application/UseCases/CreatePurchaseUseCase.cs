@@ -24,7 +24,7 @@ public class CreatePurchaseUseCase(
             .Select(item => PurchaseItem.Create(item.ProductCen, item.Quantity))
             .ToList();
 
-        var purchase = Purchase.Create(companyCen, supplier.Id, items);
+        var purchase = Purchase.Create(companyCen, supplier.Id, items, request.WarehouseCen);
 
         await purchaseRepository.AddAsync(purchase, ct);
         await unitOfWork.CommitAsync(ct);
@@ -42,6 +42,11 @@ public class CreatePurchaseUseCase(
         if (request is null)
         {
             throw new PurchasingBusinessException("La solicitud de compra es requerida.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.WarehouseCen))
+        {
+            throw new PurchasingBusinessException("El CEN del warehouse es requerido");
         }
 
         if (string.IsNullOrWhiteSpace(request.SupplierCen))

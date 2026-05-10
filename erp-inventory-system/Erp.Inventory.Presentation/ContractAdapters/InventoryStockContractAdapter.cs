@@ -198,6 +198,36 @@ public class InventoryStockContractAdapter(
             new Dictionary<int, string> { [warehouse.Id] = warehouse.Cen });
     }
 
+    public async Task<InventoryContractResult<string>> IncreaseStockAsync(string companyCen, StockIncreaseContractRequest request)
+    {
+        CenLookup company = (await cenResolver.ResolveCompanyAsync(companyCen))!;
+      
+        string movementDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
+        ResolvedStockRequest resolvedRequest = (await ResolveStockRequestAsync(company.Id, request.WarehouseCen, request.Items))!;
+
+        InventoryMovementDTO movement = await createMovementUseCase.ExecuteAsync(new CreateInventoryMovementDTO
+        {
+            Title = $"Entrada por compra {request.ReferenceCen}",
+            ExternalReference = $"PURCHASE:{request.ReferenceCen}",
+            MovementDate = movementDate,
+            MovementType = (int)MovementTypeEnum.Receipt,
+            MovementStatus = (int)MovementStatusEnum.Completed,
+            CompanyId = company.Id,
+            Transactions = resolvedRequest.Requirements.Select(requirement => new CreateTransactionDTO
+            {
+                ProductId = requirement.ProductId,
+                WarehouseId = requirement.WarehouseId,
+                Quantity = requirement.RequestedQuantity,
+                Reason = request.Reason ?? $"Compra realizada {request.ReferenceCen}",
+                TransactionDate = movementDate,
+                TransactionType = (int)TransactionTypeEnum.In
+            }).ToList()
+        });
+
+        return InventoryContractResult<string>.Ok(movement.Cen);
+    }
+
+
     private sealed record ResolvedStockRequest(
         List<StockRequirementDto> Requirements,
         IReadOnlyDictionary<int, string> ProductCensById,

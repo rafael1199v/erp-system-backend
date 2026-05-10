@@ -35,7 +35,7 @@ public class InventoryStockContractController(
     [HttpPost("increase")]
     public async Task<IActionResult> IncreaseStock(string companyCen, [FromBody] StockIncreaseContractRequest request)
     {
-        return Created();
+        return ToActionResult(await stockAdapter.IncreaseStockAsync(companyCen, request));
     } 
     
     [HttpPost("adjustments")]

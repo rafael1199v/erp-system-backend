@@ -10,4 +10,5 @@ public interface IInventoryStockContractAdapter
         string? warehouseCen = null);
     Task<InventoryContractResult<StockValidationContractResponse>> ValidateStockAsync(string companyCen, StockValidationContractRequest request);
     Task<InventoryContractResult<StockConsumeContractResponse>> ConsumeStockAsync(string companyCen, StockConsumeContractRequest request);
+    Task<InventoryContractResult<string>> IncreaseStockAsync(string companyCen, StockIncreaseContractRequest request);
 }

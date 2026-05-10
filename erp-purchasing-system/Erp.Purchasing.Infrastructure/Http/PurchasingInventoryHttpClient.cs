@@ -9,11 +9,17 @@ public class PurchasingInventoryHttpClient(HttpClient http) : IPurchasingInvento
 {
     public async Task ConfirmStockIncreaseAsync(
         string companyCen,
+        string warehouseCen,
+        string purchaseOrdenCen,
         IReadOnlyCollection<PurchaseOrderDetailItemDto> items,
         CancellationToken ct = default)
     {
         var request = new StockIncreaseContractRequest
         {
+            WarehouseCen = warehouseCen,
+            Source = "PURCHASES",
+            ReferenceCen = purchaseOrdenCen,
+            Reason = $"Registro de la compra {purchaseOrdenCen}",
             Items = items.Select(item => new StockValidationItemContractDto
             {
                 ProductCen = item.ProductCen,

@@ -34,11 +34,16 @@ public class ConfirmPurchaseUseCase(
             throw new PurchasingBusinessException("Solo se pueden confirmar ordenes de compra pendientes.");
         }
 
+        if(string.IsNullOrEmpty(purchase.WarehouseCen))
+        {
+            throw new PurchasingBusinessException("El CEN del warehouse es requerido");
+        }
+
         var inventoryItems = purchase.Items
             .Select(item => new PurchaseOrderDetailItemDto(item.ProductCen, item.Quantity))
             .ToList();
 
-        await inventoryService.ConfirmStockIncreaseAsync(companyCen, inventoryItems, ct);
+        await inventoryService.ConfirmStockIncreaseAsync(companyCen, purchase.WarehouseCen, purchase.Cen, inventoryItems, ct);
 
         var confirmedAt = DateTime.UtcNow;
         purchase.Confirm(confirmedAt);
