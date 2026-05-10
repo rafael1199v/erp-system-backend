@@ -12,6 +12,8 @@ public interface IPurchaseRepository
         string orderCen,
         CancellationToken ct = default);
 
+    Task UpdateAsync(Purchase purchase, CancellationToken ct = default);
+
     Task<PagedResultDto<PurchaseOrderListDto>> GetPagedAsync(
         string companyCen,
         PurchaseOrderQueryDto query,

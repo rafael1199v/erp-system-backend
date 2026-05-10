@@ -42,6 +42,7 @@ public class ConfirmPurchaseUseCase(
 
         var confirmedAt = DateTime.UtcNow;
         purchase.Confirm(confirmedAt);
+        await purchaseRepository.UpdateAsync(purchase, ct);
         await unitOfWork.CommitAsync(ct);
 
         return new PurchaseOrderConfirmationDto(purchase.Cen, purchase.Status, confirmedAt);

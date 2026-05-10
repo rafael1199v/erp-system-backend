@@ -22,6 +22,9 @@ public class PurchaseModel : AuditableModel
     
     [Column("purchase_date")]
     public DateOnly? PurchaseDate { get; set; }
+
+    [Column("confirmed_at")]
+    public DateTime? ConfirmedAt { get; set; }
     
     [Column("company_cen")]
     public Guid CompanyCen { get; set; }

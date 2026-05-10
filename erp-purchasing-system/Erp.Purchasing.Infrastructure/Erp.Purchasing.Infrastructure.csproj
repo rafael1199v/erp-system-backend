@@ -13,9 +13,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Erp.Purchasing.Application\Erp.Purchasing.Application.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Persistence\Repositories\" />
+      <ProjectReference Include="..\..\Inventory.Contracts\Inventory.Contracts.csproj" />
     </ItemGroup>
 </Project>
