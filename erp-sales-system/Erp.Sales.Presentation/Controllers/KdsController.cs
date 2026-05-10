@@ -6,6 +6,7 @@ namespace Erp.Sales.Presentation.Controllers;
 
 [ApiController]
 [Route("api/sales/kds")]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class KdsController(
     IGetKdsTeamsUseCase getKdsTeamsUseCase,
     IGetKdsTeamItemsUseCase getKdsTeamItemsUseCase,

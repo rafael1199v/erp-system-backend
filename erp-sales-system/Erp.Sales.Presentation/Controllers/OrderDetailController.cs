@@ -7,6 +7,7 @@ namespace Erp.Sales.Presentation.Controllers;
 
 [ApiController]
 [Route("api/sales/order-detail")]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class OrderDetailController(
     ICreateRestaurantOrderDetailUseCase createRestaurantOrderDetailUseCase,
     IUpdateRestaurantOrderDetailQuantityUseCase updateRestaurantOrderDetailQuantityUseCase,

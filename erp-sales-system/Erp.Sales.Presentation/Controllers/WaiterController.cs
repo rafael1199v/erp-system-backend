@@ -5,6 +5,7 @@ namespace Erp.Sales.Presentation.Controllers;
 
 [ApiController]
 [Route("api/sales/[controller]")]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class WaiterController(IGetWaitersByCompanyUseCase getWaitersByCompanyUseCase) : ControllerBase
 {
     [HttpGet("{companyId:int}")]

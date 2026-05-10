@@ -5,6 +5,7 @@ namespace Erp.Inventory.Presentation.Controllers;
 
 [ApiController]
 [Route("api/inventory/[controller]")]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class SupplierController(IGetSuppliersByCompanyUseCase getSuppliersByCompanyUseCase) : ControllerBase
 {
     [HttpGet("{companyId}")]

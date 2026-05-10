@@ -6,6 +6,7 @@ namespace Erp.Sales.Presentation.Controllers;
 
 [ApiController]
 [Route("api/sales/[controller]")]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class PaymentController(
     IGetPaymentTypesUseCase getPaymentTypesUseCase,
     IProcessRestaurantOrderPaymentUseCase processRestaurantOrderPaymentUseCase) : ControllerBase

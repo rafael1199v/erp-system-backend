@@ -6,6 +6,7 @@ namespace Erp.Inventory.Presentation.Controllers;
 
 [ApiController]
 [Route("api/inventory/[controller]")]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class UnitController(
     ICreateUnitUseCase createUnitUseCase,
     IGetUnitsByCompanyUseCase getUnitsByCompanyUseCase,
