@@ -4,6 +4,7 @@ using Erp.Sales.Application.UseCases.KDS;
 using Erp.Sales.Domain.Entities;
 using Erp.Sales.Domain.Enums;
 using Erp.Sales.Presentation.ContractDtos;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Erp.Sales.Presentation.Controllers.Contract;
@@ -18,6 +19,13 @@ public class KdsContractController(
     IChangeKdsItemStatusUseCase changeKdsItemStatusUseCase)
     : ControllerBase
 {
+    [EndpointSummary("Lista equipos KDS")]
+    [EndpointDescription("""
+                         Devuelve los equipos KDS configurados para la empresa.
+                         Usar para seleccionar el equipo en vistas de cocina.
+                         """)]
+    [ProducesResponseType(typeof(List<KdsTeamContractResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     [HttpGet("teams")]
     public async Task<IActionResult> GetTeams(string companyCen)
     {
@@ -36,6 +44,14 @@ public class KdsContractController(
         }).ToList());
     }
 
+    [EndpointSummary("Lista items KDS por equipo")]
+    [EndpointDescription("""
+                         Devuelve los items activos del equipo KDS en las ultimas 48 horas.
+                         Usar para tableros de preparacion y monitoreo de pedidos.
+                         Integra con el API de Inventario para enriquecer datos de producto.
+                         """)]
+    [ProducesResponseType(typeof(List<KdsItemContractResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     [HttpGet("teams/{teamCen}/items")]
     public async Task<IActionResult> GetTeamItems(string companyCen, string teamCen)
     {
@@ -68,6 +84,14 @@ public class KdsContractController(
         return Ok(items);
     }
 
+    [EndpointSummary("Actualiza estado de item KDS")]
+    [EndpointDescription("""
+                         Cambia el estado operativo de un item (created/preparing/delivered/canceled).
+                         Usar para reflejar el avance en cocina.
+                         """)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     [HttpPatch("items/{ticketItemCen}/status")]
     public async Task<IActionResult> UpdateItemStatus(
         string companyCen,

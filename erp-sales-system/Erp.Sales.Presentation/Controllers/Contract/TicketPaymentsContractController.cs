@@ -2,6 +2,7 @@ using Erp.Sales.Application.DTOs;
 using Erp.Sales.Application.Interfaces;
 using Erp.Sales.Application.UseCases.RestaurantOrder;
 using Erp.Sales.Presentation.ContractDtos;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Erp.Sales.Presentation.Controllers.Contract;
@@ -14,6 +15,15 @@ public class TicketPaymentsContractController(
     IProcessRestaurantOrderPaymentUseCase processRestaurantOrderPaymentUseCase)
     : ControllerBase
 {
+    [EndpointSummary("Procesa el pago de un ticket")]
+    [EndpointDescription("""
+                         Registra el pago de un ticket usando el metodo indicado.
+                         Usar cuando el cliente finaliza la compra.
+                         """)]
+    [ProducesResponseType(typeof(PayTicketContractResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProcessRestaurantOrderPaymentResultDto), StatusCodes.Status409Conflict)]
     [HttpPost]
     public async Task<IActionResult> PayTicket(
         string companyCen,

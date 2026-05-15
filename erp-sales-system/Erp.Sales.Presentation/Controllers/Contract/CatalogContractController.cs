@@ -1,5 +1,6 @@
 using Erp.Inventory.Contracts;
 using Erp.Sales.Application.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Erp.Sales.Presentation.Controllers.Contract;
@@ -12,6 +13,15 @@ public class CatalogContractController(
     IInventoryService inventoryService)
     : ControllerBase
 {
+    [EndpointSummary("Lista productos vendibles para ventas")]
+    [EndpointDescription("""
+                         Devuelve productos disponibles para venta en la empresa indicada.
+                         Usar para catalogos POS y seleccion de items al crear tickets.
+                         Integra con el API de Inventario para obtener productos vendibles.
+                         """)]
+    [ProducesResponseType(typeof(List<SellableProductContractDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     [HttpGet("products")]
     public async Task<IActionResult> GetProducts(
         string companyCen,
