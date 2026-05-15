@@ -1,5 +1,7 @@
+using Erp.Purchasing.Application.DTOs;
 using Erp.Purchasing.Application.Exceptions;
 using Erp.Purchasing.Application.UseCases;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Erp.Purchasing.Presentation.Controllers;
@@ -8,6 +10,13 @@ namespace Erp.Purchasing.Presentation.Controllers;
 [Route("api/purchases/companies/{companyCen}/suppliers")]
 public class SupplierController(IGetSuppliersUseCase getSuppliersUseCase) : ControllerBase
 {
+    [EndpointSummary("Lista proveedores de una empresa")]
+    [EndpointDescription("""
+                         Devuelve los proveedores disponibles para compras.
+                         Usar para poblar listas de seleccion en ordenes de compra.
+                         """)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<SupplierDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     [HttpGet]
     public async Task<IActionResult> GetSuppliers(string companyCen, CancellationToken ct = default)
     {

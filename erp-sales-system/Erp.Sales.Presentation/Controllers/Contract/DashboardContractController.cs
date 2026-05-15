@@ -1,7 +1,9 @@
 using Erp.Inventory.Contracts;
+using Erp.Sales.Application.DTOs;
 using Erp.Sales.Application.Interfaces;
 using Erp.Sales.Application.UseCases.Dashboard;
 using Erp.Sales.Presentation.ContractDtos;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Erp.Sales.Presentation.Controllers.Contract;
@@ -21,6 +23,13 @@ public class DashboardContractController(
     private const string BoliviaIanaTimeZoneId = "America/La_Paz";
     private const string BoliviaWindowsTimeZoneId = "SA Western Standard Time";
 
+    [EndpointSummary("Obtiene ventas diarias")]
+    [EndpointDescription("""
+                         Devuelve el resumen de ventas del dia actual para la empresa.
+                         Usar en dashboards ejecutivos de ventas.
+                         """)]
+    [ProducesResponseType(typeof(DailySalesDashboardDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     [HttpGet("daily-sales")]
     public async Task<IActionResult> GetDailySales(string companyCen)
     {
@@ -33,6 +42,14 @@ public class DashboardContractController(
         return Ok(await getDailySalesDashboardUseCase.ExecuteAsync(companyId.Value));
     }
 
+    [EndpointSummary("Obtiene top productos vendidos")]
+    [EndpointDescription("""
+                         Devuelve los productos mas vendidos del dia actual.
+                         Usar para analitica rapida y reportes de desempeño.
+                         Integra con el API de Inventario para enriquecer datos de producto.
+                         """)]
+    [ProducesResponseType(typeof(List<TopProductDashboardContractResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     [HttpGet("top-products")]
     public async Task<IActionResult> GetTopProducts(string companyCen, [FromQuery] int topN = DefaultTopN)
     {
@@ -78,6 +95,13 @@ public class DashboardContractController(
         }).ToList());
     }
 
+    [EndpointSummary("Obtiene estado del KDS")]
+    [EndpointDescription("""
+                         Devuelve el estado operativo del sistema KDS para la empresa.
+                         Usar para indicadores de cocina o tableros de servicio.
+                         """)]
+    [ProducesResponseType(typeof(KdsStatusDashboardDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     [HttpGet("kds-status")]
     public async Task<IActionResult> GetKdsStatus(string companyCen)
     {

@@ -5,6 +5,7 @@ using Erp.Sales.Application.UseCases.RestaurantOrder;
 using Erp.Sales.Application.UseCases.RestaurantOrderDetails;
 using Erp.Sales.Domain.Entities;
 using Erp.Sales.Presentation.ContractDtos;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Erp.Sales.Presentation.Controllers.Contract;
@@ -27,6 +28,13 @@ public class TicketsContractController(
     IInventoryService inventoryService)
     : ControllerBase
 {
+    [EndpointSummary("Lista tickets del dia")]
+    [EndpointDescription("""
+                         Devuelve los tickets activos del dia actual.
+                         Usar para paneles de operacion o historico corto.
+                         """)]
+    [ProducesResponseType(typeof(List<TicketContractResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     [HttpGet]
     public async Task<IActionResult> GetTickets(string companyCen)
     {
@@ -40,6 +48,13 @@ public class TicketsContractController(
         return Ok(tickets.Select(ToTicketResponse).ToList());
     }
 
+    [EndpointSummary("Crea un ticket")]
+    [EndpointDescription("""
+                         Abre un ticket para una nueva orden en la empresa.
+                         Usar al iniciar una atencion de mesa o pedido.
+                         """)]
+    [ProducesResponseType(typeof(TicketContractResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     [HttpPost]
     public async Task<IActionResult> CreateTicket(
         string companyCen,
@@ -83,6 +98,14 @@ public class TicketsContractController(
             response);
     }
 
+    [EndpointSummary("Lista items de un ticket")]
+    [EndpointDescription("""
+                         Devuelve los items asociados a un ticket.
+                         Usar para ver detalle de productos y cantidades.
+                         Integra con el API de Inventario para enriquecer datos de producto.
+                         """)]
+    [ProducesResponseType(typeof(List<TicketItemContractResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     [HttpGet("{ticketCen}/items")]
     public async Task<IActionResult> GetTicketItems(string companyCen, string ticketCen)
     {
@@ -96,6 +119,15 @@ public class TicketsContractController(
         return Ok(await ToTicketItemResponsesAsync(companyCen, details));
     }
 
+    [EndpointSummary("Agrega un item a un ticket")]
+    [EndpointDescription("""
+                         Crea un nuevo item dentro del ticket con producto y cantidad.
+                         Usar para registrar pedidos de clientes.
+                         Integra con el API de Inventario para enriquecer datos de producto.
+                         """)]
+    [ProducesResponseType(typeof(TicketItemContractResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     [HttpPost("{ticketCen}/items")]
     public async Task<IActionResult> CreateTicketItem(
         string companyCen,
@@ -131,6 +163,14 @@ public class TicketsContractController(
             response.First());
     }
 
+    [EndpointSummary("Actualiza un item de ticket")]
+    [EndpointDescription("""
+                         Modifica cantidad o nota del item en el ticket.
+                         Usar para ajustes solicitados por el cliente.
+                         Integra con el API de Inventario para enriquecer datos de producto.
+                         """)]
+    [ProducesResponseType(typeof(TicketItemContractResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     [HttpPatch("{ticketCen}/items/{ticketItemCen}")]
     public async Task<IActionResult> UpdateTicketItem(
         string companyCen,
@@ -156,6 +196,14 @@ public class TicketsContractController(
         return Ok(response.First());
     }
 
+    [EndpointSummary("Reenvia un item a cocina")]
+    [EndpointDescription("""
+                         Marca un item para reenvio en el flujo de cocina.
+                         Usar cuando un item debe prepararse nuevamente.
+                         Integra con el API de Inventario para enriquecer datos de producto.
+                         """)]
+    [ProducesResponseType(typeof(TicketItemContractResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     [HttpPost("{ticketCen}/items/{ticketItemCen}/resend")]
     public async Task<IActionResult> ResendTicketItem(string companyCen, string ticketCen, string ticketItemCen)
     {
@@ -174,6 +222,14 @@ public class TicketsContractController(
         return Ok(response.First());
     }
 
+    [EndpointSummary("Envia un ticket a cocina")]
+    [EndpointDescription("""
+                         Cambia el estado del ticket para iniciar preparacion.
+                         Usar cuando el pedido esta listo para cocina.
+                         Integra con el API de Inventario para enriquecer datos de producto.
+                         """)]
+    [ProducesResponseType(typeof(List<TicketItemContractResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     [HttpPost("{ticketCen}/send")]
     public async Task<IActionResult> SendTicket(string companyCen, string ticketCen)
     {
@@ -189,6 +245,14 @@ public class TicketsContractController(
         return Ok(await ToTicketItemResponsesAsync(companyCen, details));
     }
 
+    [EndpointSummary("Asigna mesero a un ticket")]
+    [EndpointDescription("""
+                         Asocia un mesero al ticket abierto.
+                         Usar cuando se reasigna la atencion de la mesa.
+                         """)]
+    [ProducesResponseType(typeof(AssignTicketWaiterContractResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     [HttpPut("{ticketCen}/waiter")]
     public async Task<IActionResult> AssignTicketWaiter(
         string companyCen,
@@ -222,6 +286,14 @@ public class TicketsContractController(
         });
     }
 
+    [EndpointSummary("Cancela un ticket")]
+    [EndpointDescription("""
+                         Cancela un ticket activo por solicitud del cliente o error.
+                         Usar antes del pago si el pedido no debe continuar.
+                         """)]
+    [ProducesResponseType(typeof(CancelTicketContractResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status409Conflict)]
     [HttpPost("{ticketCen}/cancel")]
     public async Task<IActionResult> CancelTicket(
         string companyCen,
@@ -249,6 +321,14 @@ public class TicketsContractController(
         });
     }
 
+    [EndpointSummary("Imprime un ticket")]
+    [EndpointDescription("""
+                         Genera el PDF del ticket para impresion o envio.
+                         Usar al cerrar la cuenta o para comprobantes.
+                         """)]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status409Conflict)]
     [HttpGet("{ticketCen}/print")]
     public async Task<IActionResult> PrintTicket(string companyCen, string ticketCen)
     {
@@ -267,6 +347,14 @@ public class TicketsContractController(
         }
     }
 
+    [EndpointSummary("Obtiene totales de un ticket")]
+    [EndpointDescription("""
+                         Devuelve subtotal, impuesto y total del ticket.
+                         Usar para mostrar resumen antes de cobrar.
+                         """)]
+    [ProducesResponseType(typeof(TicketTotalsContractResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status409Conflict)]
     [HttpGet("{ticketCen}/totals")]
     public async Task<IActionResult> GetTicketTotals(string companyCen, string ticketCen)
     {
