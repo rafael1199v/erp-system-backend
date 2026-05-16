@@ -1,4 +1,4 @@
-namespace Erp.Sales.Presentation.ContractDtos;
+namespace Erp.Sales.Application.ContractDtos;
 
 public class TaxConfigurationContractResponse
 {

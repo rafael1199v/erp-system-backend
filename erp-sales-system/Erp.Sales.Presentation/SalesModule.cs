@@ -1,4 +1,5 @@
 using Erp.Inventory.Contracts;
+using Erp.Sales.Application.ContractServices;
 using Erp.Sales.Application.Interfaces;
 using Erp.Sales.Application.Services;
 using Erp.Sales.Application.UseCases.Dashboard;
@@ -71,6 +72,8 @@ public static class SalesModule
         services.AddScoped<IGetDailySalesDashboardUseCase, GetDailySalesDashboardUseCase>();
         services.AddScoped<IGetTopProductsDashboardUseCase, GetTopProductsDashboardUseCase>();
         services.AddScoped<IGetKdsStatusDashboardUseCase, GetKdsStatusDashboardUseCase>();
+        services.AddScoped<ISalesDashboardContractService, SalesDashboardContractService>();
+        services.AddScoped<ITicketContractService, TicketContractService>();
         
         services.AddScoped<ITaxConfigurationRepository, TaxConfigurationRepository>();
         services.AddScoped<IRestaurantOrderRepository, RestaurantOrderRepository>();
