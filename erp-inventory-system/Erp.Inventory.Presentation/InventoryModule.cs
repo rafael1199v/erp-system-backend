@@ -15,7 +15,7 @@ using Erp.Inventory.Contracts;
 using Erp.Inventory.Infrastructure.Persistance.Context;
 using Erp.Inventory.Infrastructure.Persistance.Repositories;
 using Erp.Inventory.Infrastructure.Persistance.Services;
-using Erp.Inventory.Presentation.ContractAdapters;
+using Erp.Inventory.Application.ContractAdapters;
 using Erp.Inventory.Presentation.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
