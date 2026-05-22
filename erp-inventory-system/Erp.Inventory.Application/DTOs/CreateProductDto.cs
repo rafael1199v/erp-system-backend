@@ -6,7 +6,7 @@ public record CreateProductDto(
     int UnitId,
     int CompanyId,
     int ProductStatusId,
-    int SupplierId,
+    int? SupplierId,
     int CategoryId,
     decimal CurrentCost,
     int ReorderLevel,

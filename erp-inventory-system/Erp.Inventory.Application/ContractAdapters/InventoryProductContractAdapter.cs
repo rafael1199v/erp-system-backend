@@ -111,7 +111,7 @@ public class InventoryProductContractAdapter(
             UnitId: unit.Id,
             CompanyId: company.Id,
             ProductStatusId: InventoryContractAdapterDefaults.ActiveProductStatusId,
-            SupplierId: InventoryContractAdapterDefaults.DefaultSupplierId,
+            SupplierId: null,
             CategoryId: category.Id,
             CurrentCost: request.CostPrice ?? request.SalePrice,
             ReorderLevel: decimal.ToInt32(decimal.Truncate(request.ReorderLevel)),

@@ -198,7 +198,7 @@ public class ProductRepository : IProductRepository
         product.UnitId = productCompanyEntity.UnitId;
         product.CategoryId = productCompanyEntity.CategoryId;
         product.ProductStatusId = productCompanyEntity.ProductStatusId;
-        product.SupplierId = productCompanyEntity.SupplierId;
+        //product.SupplierId = productCompanyEntity.SupplierId;
         product.CurrentCost = productCompanyEntity.CurrentCost;
         product.ReorderLevel = productCompanyEntity.ReorderLevel;
         product.SellPrice = productCompanyEntity.SellPrice;
