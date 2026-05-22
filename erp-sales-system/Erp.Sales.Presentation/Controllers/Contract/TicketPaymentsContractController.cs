@@ -4,6 +4,7 @@ using Erp.Sales.Application.UseCases.RestaurantOrder;
 using Erp.Sales.Application.ContractDtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Erp.Sales.Application.Constants;
 
 namespace Erp.Sales.Presentation.Controllers.Contract;
 
@@ -11,7 +12,7 @@ namespace Erp.Sales.Presentation.Controllers.Contract;
 [Route("api/sales/companies/{companyCen}/tickets/{ticketCen}/payment")]
 public class TicketPaymentsContractController(
     ISalesCenResolver salesCenResolver,
-    IPaymentTypeRepository paymentTypeRepository,
+    ISalesPaymentResolver paymentResolver,
     IProcessRestaurantOrderPaymentUseCase processRestaurantOrderPaymentUseCase)
     : ControllerBase
 {
@@ -36,12 +37,8 @@ public class TicketPaymentsContractController(
             return NotFound(new { message = "Ticket no encontrado" });
         }
 
-        if (string.IsNullOrWhiteSpace(request.PaymentMethodCode))
-        {
-            return BadRequest(new { message = "paymentMethodCode es requerido" });
-        }
+        int? paymentTypeId = await paymentResolver.ResolvePaymentIdByCode(request.PaymentMethodCode);
 
-        int? paymentTypeId = await paymentTypeRepository.ResolveIdByCodeAsync(request.PaymentMethodCode);
         if (paymentTypeId is null)
         {
             return BadRequest(new { message = "Metodo de pago no valido" });
@@ -63,7 +60,7 @@ public class TicketPaymentsContractController(
         {
             SaleCen = result.SaleCen ?? string.Empty,
             TicketCen = ticket.Cen,
-            Status = "Paid",
+            Status = PaymentStatus.Paid,
             Subtotal = result.Subtotal,
             TaxAmount = result.TaxAmount,
             Total = result.Total,
