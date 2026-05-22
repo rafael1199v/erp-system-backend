@@ -86,6 +86,7 @@ public static class SalesModule
         services.AddScoped<IPaymentTypeRepository, PaymentTypeRepository>();
         services.AddScoped<IPaymentProcessRepository, PaymentProcessRepository>();
         services.AddScoped<ISalesCenResolver, SalesCenResolver>();
+        services.AddScoped<ISalesPaymentResolver, SalesPaymentResolver>();
 
         services.AddHttpClient<IInventoryService, InventoryHttpClient>(client =>
         {
