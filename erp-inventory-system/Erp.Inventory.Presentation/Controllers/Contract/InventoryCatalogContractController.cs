@@ -1,6 +1,6 @@
 using Erp.Inventory.Contracts;
-using Erp.Inventory.Presentation.ContractAdapters;
-using Erp.Inventory.Presentation.ContractDtos;
+using Erp.Inventory.Application.ContractAdapters;
+using Erp.Inventory.Application.ContractDtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

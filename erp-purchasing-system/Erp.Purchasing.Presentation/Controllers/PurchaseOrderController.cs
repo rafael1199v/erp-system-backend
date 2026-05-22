@@ -1,5 +1,4 @@
 using Erp.Purchasing.Application.DTOs;
-using Erp.Purchasing.Application.Exceptions;
 using Erp.Purchasing.Application.UseCases;
 using Erp.Purchasing.Domain.Enums;
 using Microsoft.AspNetCore.Http;
@@ -31,15 +30,8 @@ public class PurchaseOrderController(
         [FromQuery] bool sortDescending = true,
         CancellationToken ct = default)
     {
-        try
-        {
-            var query = new PurchaseOrderQueryDto(status, page, pageSize, sortDescending);
-            return Ok(await getPurchaseUseCase.GetPagedAsync(companyCen, query, ct));
-        }
-        catch (Exception ex)
-        {
-            return ToErrorResult(ex);
-        }
+        var query = new PurchaseOrderQueryDto(status, page, pageSize, sortDescending);
+        return Ok(await getPurchaseUseCase.GetPagedAsync(companyCen, query, ct));
     }
 
     [EndpointSummary("Obtiene el detalle de una orden de compra")]
@@ -53,14 +45,7 @@ public class PurchaseOrderController(
     [HttpGet("{orderCen}")]
     public async Task<IActionResult> GetOrder(string companyCen, string orderCen, CancellationToken ct = default)
     {
-        try
-        {
-            return Ok(await getPurchaseUseCase.GetDetailAsync(companyCen, orderCen, ct));
-        }
-        catch (Exception ex)
-        {
-            return ToErrorResult(ex);
-        }
+        return Ok(await getPurchaseUseCase.GetDetailAsync(companyCen, orderCen, ct));
     }
 
     [EndpointSummary("Crea una orden de compra")]
@@ -77,18 +62,11 @@ public class PurchaseOrderController(
         [FromBody] CreatePurchaseOrderDto request,
         CancellationToken ct = default)
     {
-        try
-        {
-            var result = await createPurchaseUseCase.ExecuteAsync(companyCen, request, ct);
-            return CreatedAtAction(
-                nameof(GetOrder),
-                new { companyCen, orderCen = result.OrderCen },
-                result);
-        }
-        catch (Exception ex)
-        {
-            return ToErrorResult(ex);
-        }
+        var result = await createPurchaseUseCase.ExecuteAsync(companyCen, request, ct);
+        return CreatedAtAction(
+            nameof(GetOrder),
+            new { companyCen, orderCen = result.OrderCen },
+            result);
     }
 
     [EndpointSummary("Confirma una orden de compra")]
@@ -103,25 +81,6 @@ public class PurchaseOrderController(
     [HttpPost("{orderCen}/confirm")]
     public async Task<IActionResult> ConfirmOrder(string companyCen, string orderCen, CancellationToken ct = default)
     {
-        try
-        {
-            return Ok(await confirmPurchaseUseCase.ExecuteAsync(companyCen, orderCen, ct));
-        }
-        catch (Exception ex)
-        {
-            return ToErrorResult(ex);
-        }
-    }
-
-    private IActionResult ToErrorResult(Exception exception)
-    {
-        return exception switch
-        {
-            PurchasingNotFoundException => NotFound(new { message = exception.Message }),
-            KeyNotFoundException => NotFound(new { message = exception.Message }),
-            PurchasingBusinessException => BadRequest(new { message = exception.Message }),
-            InvalidOperationException => BadRequest(new { message = exception.Message }),
-            _ => BadRequest(new { message = exception.Message })
-        };
+        return Ok(await confirmPurchaseUseCase.ExecuteAsync(companyCen, orderCen, ct));
     }
 }

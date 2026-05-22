@@ -40,8 +40,8 @@ public class Product
     public ProductStatus ProductStatus { get; set; } = null!;
     
     [Column("supplier_id")]
-    public int SupplierId { get; set; }
-    public Supplier Supplier { get; set; } = null!;
+    public int? SupplierId { get; set; }
+    public Supplier? Supplier { get; set; }
 
     [Column("current_cost",TypeName = "decimal(12, 2)")]
     public decimal CurrentCost { get; set; } = 0.00m;

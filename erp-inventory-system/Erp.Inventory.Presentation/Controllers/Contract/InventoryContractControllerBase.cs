@@ -1,4 +1,4 @@
-using Erp.Inventory.Presentation.ContractAdapters;
+using Erp.Inventory.Application.ContractAdapters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

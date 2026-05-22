@@ -21,7 +21,7 @@ public class GetProductWithCompanyUseCase(IProductRepository productRepository) 
             UnitId: productWithCompanyEntity.UnitId,
             CompanyId: productWithCompanyEntity.CompanyId,
             CategoryId: productWithCompanyEntity.CategoryId,
-            SupplierId: productWithCompanyEntity.SupplierId,
+            SupplierId: productWithCompanyEntity.SupplierId ?? 0,
             ProductStatusId: productWithCompanyEntity.ProductStatusId,
             CurrentCost: productWithCompanyEntity.CurrentCost,
             ReorderLevel: productWithCompanyEntity.ReorderLevel,

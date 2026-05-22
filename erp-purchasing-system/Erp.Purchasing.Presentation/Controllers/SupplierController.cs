@@ -1,5 +1,4 @@
 using Erp.Purchasing.Application.DTOs;
-using Erp.Purchasing.Application.Exceptions;
 using Erp.Purchasing.Application.UseCases;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,23 +19,6 @@ public class SupplierController(IGetSuppliersUseCase getSuppliersUseCase) : Cont
     [HttpGet]
     public async Task<IActionResult> GetSuppliers(string companyCen, CancellationToken ct = default)
     {
-        try
-        {
-            return Ok(await getSuppliersUseCase.ExecuteAsync(companyCen, ct));
-        }
-        catch (Exception ex)
-        {
-            return ToErrorResult(ex);
-        }
-    }
-
-    private IActionResult ToErrorResult(Exception exception)
-    {
-        return exception switch
-        {
-            PurchasingBusinessException => BadRequest(new { message = exception.Message }),
-            InvalidOperationException => BadRequest(new { message = exception.Message }),
-            _ => BadRequest(new { message = exception.Message })
-        };
+        return Ok(await getSuppliersUseCase.ExecuteAsync(companyCen, ct));
     }
 }

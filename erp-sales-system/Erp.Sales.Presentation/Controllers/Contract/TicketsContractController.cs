@@ -1,10 +1,10 @@
-using Erp.Inventory.Contracts;
+using Erp.Sales.Application.ContractServices;
 using Erp.Sales.Application.DTOs;
 using Erp.Sales.Application.Interfaces;
 using Erp.Sales.Application.UseCases.RestaurantOrder;
 using Erp.Sales.Application.UseCases.RestaurantOrderDetails;
 using Erp.Sales.Domain.Entities;
-using Erp.Sales.Presentation.ContractDtos;
+using Erp.Sales.Application.ContractDtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +25,7 @@ public class TicketsContractController(
     IGetTicketTotalsUseCase getTicketTotalsUseCase,
     IRestaurantOrderRepository restaurantOrderRepository,
     IRestaurantOrderDetailRepository restaurantOrderDetailRepository,
-    IInventoryService inventoryService)
+    ITicketContractService ticketContractService)
     : ControllerBase
 {
     [EndpointSummary("Lista tickets del dia")]
@@ -45,7 +45,7 @@ public class TicketsContractController(
         }
 
         List<RestaurantOrder> tickets = await restaurantOrderRepository.GetCurrentDayOrders(companyId.Value);
-        return Ok(tickets.Select(ToTicketResponse).ToList());
+        return Ok(tickets.Select(ticketContractService.ToTicketResponse).ToList());
     }
 
     [EndpointSummary("Crea un ticket")]
@@ -90,7 +90,7 @@ public class TicketsContractController(
         RestaurantOrder ticket = await restaurantOrderRepository.GetByIdAsync(ticketId)
                                  ?? throw new InvalidOperationException("No se pudo recuperar el ticket creado");
 
-        TicketContractResponse response = ToTicketResponse(ticket);
+        TicketContractResponse response = ticketContractService.ToTicketResponse(ticket);
         response.WaiterCen = waiter?.Cen;
 
         return Created(
@@ -116,7 +116,7 @@ public class TicketsContractController(
         }
 
         List<RestaurantOrderDetail> details = await restaurantOrderDetailRepository.GetByRestaurantOrderIdAsync(ticket.Id);
-        return Ok(await ToTicketItemResponsesAsync(companyCen, details));
+        return Ok(await ticketContractService.ToTicketItemResponsesAsync(companyCen, details));
     }
 
     [EndpointSummary("Agrega un item a un ticket")]
@@ -155,7 +155,7 @@ public class TicketsContractController(
         RestaurantOrderDetail item = await restaurantOrderDetailRepository.GetByIdAsync(ticketItemId)
                                      ?? throw new InvalidOperationException("No se pudo recuperar el item creado");
 
-        List<TicketItemContractResponse> response = await ToTicketItemResponsesAsync(companyCen, [item]);
+        List<TicketItemContractResponse> response = await ticketContractService.ToTicketItemResponsesAsync(companyCen, [item]);
         string itemCen = response.First().TicketItemCen;
 
         return Created(
@@ -192,7 +192,7 @@ public class TicketsContractController(
         RestaurantOrderDetail updatedItem = await restaurantOrderDetailRepository.GetByIdAsync(item.Id)
                                             ?? throw new InvalidOperationException("No se pudo recuperar el item actualizado");
 
-        List<TicketItemContractResponse> response = await ToTicketItemResponsesAsync(companyCen, [updatedItem]);
+        List<TicketItemContractResponse> response = await ticketContractService.ToTicketItemResponsesAsync(companyCen, [updatedItem]);
         return Ok(response.First());
     }
 
@@ -218,7 +218,7 @@ public class TicketsContractController(
         RestaurantOrderDetail updatedItem = await restaurantOrderDetailRepository.GetByIdAsync(item.Id)
                                             ?? throw new InvalidOperationException("No se pudo recuperar el item reenviado");
 
-        List<TicketItemContractResponse> response = await ToTicketItemResponsesAsync(companyCen, [updatedItem]);
+        List<TicketItemContractResponse> response = await ticketContractService.ToTicketItemResponsesAsync(companyCen, [updatedItem]);
         return Ok(response.First());
     }
 
@@ -242,7 +242,7 @@ public class TicketsContractController(
         await sendOrderUseCase.ExecuteAsync(ticket.Id);
 
         List<RestaurantOrderDetail> details = await restaurantOrderDetailRepository.GetByRestaurantOrderIdAsync(ticket.Id);
-        return Ok(await ToTicketItemResponsesAsync(companyCen, details));
+        return Ok(await ticketContractService.ToTicketItemResponsesAsync(companyCen, details));
     }
 
     [EndpointSummary("Asigna mesero a un ticket")]
@@ -381,64 +381,4 @@ public class TicketsContractController(
         }
     }
 
-    private static TicketContractResponse ToTicketResponse(RestaurantOrder ticket)
-    {
-        return new TicketContractResponse
-        {
-            TicketCen = ticket.Cen,
-            DailyNumber = ticket.Order.DailyNumber,
-            Status = ticket.Order.Status.ToString(),
-            CreatedAt = ticket.OrderDatetime.ToString("o"),
-            CompanyCen = ticket.CompanyCen,
-            TaxAmount = ticket.TaxPrice,
-            WaiterCen = ticket.WaiterCen,
-        };
-    }
-
-    private async Task<List<TicketItemContractResponse>> ToTicketItemResponsesAsync(
-        string companyCen,
-        List<RestaurantOrderDetail> details)
-    {
-        if (details.Count == 0)
-        {
-            return [];
-        }
-
-        Dictionary<string, ProductContractDto> productsByCen = await GetProductsByCenAsync(companyCen, details);
-
-        return details.Select(detail =>
-        {
-            ProductContractDto? product = null;
-            if (!string.IsNullOrWhiteSpace(detail.ProductCen))
-            {
-                productsByCen.TryGetValue(detail.ProductCen, out product);
-            }
-
-            return new TicketItemContractResponse
-            {
-                TicketItemCen = detail.Cen,
-                ProductCen = detail.ProductCen ?? string.Empty,
-                ProductName = product?.Name ?? "Producto sin CEN",
-                Quantity = detail.Quantity,
-                UnitPrice = product?.SalePrice ?? 0,
-                Note = detail.Note,
-                Status = detail.Status.ToString(),
-                SentAt = detail.SentAt?.ToString("o"),
-                ResendCount = detail.ResendCount
-            };
-        }).ToList();
-    }
-
-    private async Task<Dictionary<string, ProductContractDto>> GetProductsByCenAsync(
-        string companyCen,
-        List<RestaurantOrderDetail> details)
-    {
-        if (details.All(detail => string.IsNullOrWhiteSpace(detail.ProductCen)))
-        {
-            return new Dictionary<string, ProductContractDto>(StringComparer.OrdinalIgnoreCase);
-        }
-
-        List<ProductContractDto> products = await inventoryService.GetProductsAsync(companyCen);
-        return products.ToDictionary(product => product.ProductCen, StringComparer.OrdinalIgnoreCase);
-    }
 }

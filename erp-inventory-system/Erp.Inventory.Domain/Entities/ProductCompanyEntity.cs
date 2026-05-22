@@ -11,7 +11,7 @@ public class ProductCompanyEntity
     public required int UnitId { get; init; }
     public required int CompanyId { get; init; }
     public required int ProductStatusId { get; init; }
-    public required int SupplierId { get; init; }
+    public required int? SupplierId { get; init; }
     public required int CategoryId { get; init; }
     public required decimal CurrentCost { get; init; }
     public required int ReorderLevel { get; init; }
@@ -26,7 +26,7 @@ public class ProductCompanyEntity
         int companyId,
         int categoryId,
         int productStatusId,
-        int supplierId,
+        int? supplierId,
         decimal currentCost,
         int reorderLevel,
         decimal sellPrice,

@@ -23,7 +23,7 @@ public class GetTicketTotalsUseCase(
 
         if (chargeableDetails.Count == 0)
         {
-            return new TicketTotalsDto(0, restaurantOrder.Order.TaxPrice, restaurantOrder.Order.TaxPrice);
+            return new TicketTotalsDto(0, restaurantOrder.Order.TaxPrice, 0);
         }
 
         if (!CanUseCenInventory(restaurantOrder.CompanyCen, chargeableDetails))

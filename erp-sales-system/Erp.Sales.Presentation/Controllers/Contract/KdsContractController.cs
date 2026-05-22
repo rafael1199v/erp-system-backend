@@ -3,7 +3,7 @@ using Erp.Sales.Application.Interfaces;
 using Erp.Sales.Application.UseCases.KDS;
 using Erp.Sales.Domain.Entities;
 using Erp.Sales.Domain.Enums;
-using Erp.Sales.Presentation.ContractDtos;
+using Erp.Sales.Application.ContractDtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
