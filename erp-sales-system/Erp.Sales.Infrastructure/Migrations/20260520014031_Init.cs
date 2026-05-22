@@ -1,12 +1,13 @@
-﻿#nullable disable
-
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+
+#nullable disable
 
 namespace Erp.Sales.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitSalesMigration : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,6 +26,7 @@ namespace Erp.Sales.Infrastructure.Migrations
                     Email = table.Column<string>(type: "text", nullable: false),
                     PhoneNumber = table.Column<string>(type: "text", nullable: false),
                     CompanyId = table.Column<int>(type: "integer", nullable: false),
+                    CompanyCen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
@@ -88,6 +90,7 @@ namespace Erp.Sales.Infrastructure.Migrations
                 {
                     CompanyId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CompanyCen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     GlobalTaxPercentage = table.Column<decimal>(type: "numeric", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
@@ -104,8 +107,10 @@ namespace Erp.Sales.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Cen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     CompanyId = table.Column<int>(type: "integer", nullable: false),
+                    CompanyCen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
@@ -121,8 +126,10 @@ namespace Erp.Sales.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Cen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     CompanyId = table.Column<int>(type: "integer", nullable: false),
+                    CompanyCen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
@@ -132,17 +139,36 @@ namespace Erp.Sales.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "warehouse_configurations",
+                schema: "sal",
+                columns: table => new
+                {
+                    CompanyId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CompanyCen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
+                    MainWarehouseId = table.Column<int>(type: "integer", nullable: false),
+                    MainWarehouseCen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_warehouse_configurations", x => x.CompanyId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "orders",
                 schema: "sal",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Title = table.Column<string>(type: "text", nullable: false),
+                    DailyNumber = table.Column<int>(type: "integer", nullable: false),
                     OrderDatetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     OrderStatusId = table.Column<int>(type: "integer", nullable: false),
                     CustomerId = table.Column<int>(type: "integer", nullable: true),
                     CompanyId = table.Column<int>(type: "integer", nullable: false),
+                    CompanyCen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     TaxPrice = table.Column<decimal>(type: "numeric", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
@@ -172,7 +198,7 @@ namespace Erp.Sales.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Title = table.Column<string>(type: "text", nullable: false),
+                    Cen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     SubtotalPrice = table.Column<decimal>(type: "numeric", nullable: false),
                     TaxPrice = table.Column<decimal>(type: "numeric", nullable: false),
                     DiscountPercentage = table.Column<decimal>(type: "numeric", nullable: false),
@@ -180,6 +206,7 @@ namespace Erp.Sales.Infrastructure.Migrations
                     CustomerId = table.Column<int>(type: "integer", nullable: true),
                     PaymentTypeId = table.Column<int>(type: "integer", nullable: false),
                     CompanyId = table.Column<int>(type: "integer", nullable: false),
+                    CompanyCen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
@@ -208,7 +235,9 @@ namespace Erp.Sales.Infrastructure.Migrations
                 {
                     CompanyId = table.Column<int>(type: "integer", nullable: false),
                     CategoryId = table.Column<int>(type: "integer", nullable: false),
-                    TeamId = table.Column<int>(type: "integer", nullable: false)
+                    TeamId = table.Column<int>(type: "integer", nullable: false),
+                    CompanyCen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
+                    CategoryCen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -231,6 +260,7 @@ namespace Erp.Sales.Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     OrderId = table.Column<int>(type: "integer", nullable: false),
                     ProductId = table.Column<int>(type: "integer", nullable: false),
+                    ProductCen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
                     ProductPrice = table.Column<decimal>(type: "numeric", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -255,6 +285,7 @@ namespace Erp.Sales.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Cen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     OrderId = table.Column<int>(type: "integer", nullable: false),
                     WaiterId = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -287,6 +318,7 @@ namespace Erp.Sales.Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     SaleId = table.Column<int>(type: "integer", nullable: false),
                     ProductId = table.Column<int>(type: "integer", nullable: false),
+                    ProductCen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -311,11 +343,15 @@ namespace Erp.Sales.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Cen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     RestaurantOrderId = table.Column<int>(type: "integer", nullable: false),
                     ProductId = table.Column<int>(type: "integer", nullable: false),
+                    ProductCen = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
                     RestaurantOrderDetailStatusId = table.Column<int>(type: "integer", nullable: false),
-                    Note = table.Column<string>(type: "text", nullable: false),
+                    Note = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: true),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
                     SentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ResendCount = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
@@ -339,10 +375,28 @@ namespace Erp.Sales.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_customers_CompanyCen",
+                schema: "sal",
+                table: "customers",
+                column: "CompanyCen");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_order_details_OrderModelId",
                 schema: "sal",
                 table: "order_details",
                 column: "OrderModelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_order_details_ProductCen",
+                schema: "sal",
+                table: "order_details",
+                column: "ProductCen");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_orders_CompanyCen",
+                schema: "sal",
+                table: "orders",
+                column: "CompanyCen");
 
             migrationBuilder.CreateIndex(
                 name: "IX_orders_CustomerId",
@@ -357,6 +411,19 @@ namespace Erp.Sales.Infrastructure.Migrations
                 column: "OrderStatusId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_restaurant_order_details_Cen",
+                schema: "sal",
+                table: "restaurant_order_details",
+                column: "Cen",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_restaurant_order_details_ProductCen",
+                schema: "sal",
+                table: "restaurant_order_details",
+                column: "ProductCen");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_restaurant_order_details_RestaurantOrderDetailStatusId",
                 schema: "sal",
                 table: "restaurant_order_details",
@@ -367,6 +434,13 @@ namespace Erp.Sales.Infrastructure.Migrations
                 schema: "sal",
                 table: "restaurant_order_details",
                 column: "RestaurantOrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_restaurant_orders_Cen",
+                schema: "sal",
+                table: "restaurant_orders",
+                column: "Cen",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_restaurant_orders_OrderId",
@@ -381,10 +455,29 @@ namespace Erp.Sales.Infrastructure.Migrations
                 column: "WaiterId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_sale_details_ProductCen",
+                schema: "sal",
+                table: "sale_details",
+                column: "ProductCen");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_sale_details_SaleId",
                 schema: "sal",
                 table: "sale_details",
                 column: "SaleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_sales_Cen",
+                schema: "sal",
+                table: "sales",
+                column: "Cen",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_sales_CompanyCen",
+                schema: "sal",
+                table: "sales",
+                column: "CompanyCen");
 
             migrationBuilder.CreateIndex(
                 name: "IX_sales_CustomerId",
@@ -399,10 +492,66 @@ namespace Erp.Sales.Infrastructure.Migrations
                 column: "PaymentTypeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_tax_configurations_CompanyCen",
+                schema: "sal",
+                table: "tax_configurations",
+                column: "CompanyCen");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_team_configurations_CategoryCen",
+                schema: "sal",
+                table: "team_configurations",
+                column: "CategoryCen");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_team_configurations_CompanyCen",
+                schema: "sal",
+                table: "team_configurations",
+                column: "CompanyCen");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_team_configurations_TeamId",
                 schema: "sal",
                 table: "team_configurations",
                 column: "TeamId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_teams_CompanyCen",
+                schema: "sal",
+                table: "teams",
+                column: "CompanyCen");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_teams_CompanyId_Cen",
+                schema: "sal",
+                table: "teams",
+                columns: new[] { "CompanyId", "Cen" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_waiters_CompanyCen",
+                schema: "sal",
+                table: "waiters",
+                column: "CompanyCen");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_waiters_CompanyId_Cen",
+                schema: "sal",
+                table: "waiters",
+                columns: new[] { "CompanyId", "Cen" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_warehouse_configurations_CompanyCen",
+                schema: "sal",
+                table: "warehouse_configurations",
+                column: "CompanyCen");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_warehouse_configurations_MainWarehouseCen",
+                schema: "sal",
+                table: "warehouse_configurations",
+                column: "MainWarehouseCen");
         }
 
         /// <inheritdoc />
@@ -426,6 +575,10 @@ namespace Erp.Sales.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "team_configurations",
+                schema: "sal");
+
+            migrationBuilder.DropTable(
+                name: "warehouse_configurations",
                 schema: "sal");
 
             migrationBuilder.DropTable(
