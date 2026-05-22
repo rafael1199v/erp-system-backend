@@ -5,3 +5,5 @@
 **/bin\\Debug
 schema.sql
 **/*.lscache
+**/erp-system.sln.DotSettings.user
+docs
