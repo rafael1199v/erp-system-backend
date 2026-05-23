@@ -25,4 +25,15 @@ public interface IProductRepository
     Task<List<RestaurantOrderDetailProductDto>> GetRestaurantOrderDetailProductsAsync(List<int> productIds);
 
     Task<List<ProductInformationDto>> GetProductInformationAsync(int companyId, List<int> productIds);
+
+    Task<List<GetProductCatalogDTO>> GetProductsByCensAsync(int companyId, IEnumerable<string> productCens);
+
+    Task<List<SellableProductContractDto>> GetSellableProductsAsync(
+        int companyId,
+        string? search,
+        string? categoryCen,
+        string? warehouseCen,
+        bool onlyAvailable,
+        int page,
+        int pageSize);
 }

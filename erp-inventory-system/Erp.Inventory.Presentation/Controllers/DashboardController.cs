@@ -5,6 +5,7 @@ namespace Erp.Inventory.Presentation.Controllers;
 
 [ApiController]
 [Route("api/inventory/dashboard")]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class DashboardController(IGetLowStockDashboardUseCase getLowStockDashboardUseCase) : ControllerBase
 {
     [HttpGet("{companyId:int}/low-stock")]

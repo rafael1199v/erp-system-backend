@@ -22,6 +22,13 @@ public class AppDbContext : DbContext
     public DbSet<InventoryMovement> InventoryMovements => Set<InventoryMovement>();
     public DbSet<Unit> Units => Set<Unit>();
     public DbSet<CoreProduct> CoreProducts => Set<CoreProduct>();
+
+    private const int CenMaxLength = 80;
+    private const int SkuMaxLength = 100;
+    private const int DescriptionMaxLength = 500;
+    private const int AbbreviationMaxLength = 20;
+    private const int StationCodeMaxLength = 50;
+    private const int ExternalReferenceMaxLength = 120;
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     { }
@@ -45,6 +52,54 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<InventoryMovement>().ToTable("inventory_movements");
         modelBuilder.Entity<Unit>().ToTable("units");
         modelBuilder.Entity<CoreProduct>().ToTable("core_products");
+
+        modelBuilder.Entity<Company>(entity =>
+        {
+            entity.Property(company => company.Cen).HasMaxLength(CenMaxLength);
+            entity.HasIndex(company => company.Cen).IsUnique();
+        });
+
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.Property(category => category.Cen).HasMaxLength(CenMaxLength);
+            entity.Property(category => category.Description).HasMaxLength(DescriptionMaxLength);
+            entity.HasIndex(category => new { category.CompanyId, category.Cen }).IsUnique();
+        });
+
+        modelBuilder.Entity<Unit>(entity =>
+        {
+            entity.Property(unit => unit.Cen).HasMaxLength(CenMaxLength);
+            entity.Property(unit => unit.Abbreviation).HasMaxLength(AbbreviationMaxLength);
+            entity.HasIndex(unit => new { unit.CompanyId, unit.Cen }).IsUnique();
+        });
+
+        modelBuilder.Entity<Warehouse>(entity =>
+        {
+            entity.Property(warehouse => warehouse.Cen).HasMaxLength(CenMaxLength);
+            entity.HasIndex(warehouse => new { warehouse.CompanyId, warehouse.Cen }).IsUnique();
+        });
+
+        modelBuilder.Entity<Product>(entity =>
+        {
+            entity.Property(product => product.Cen).HasMaxLength(CenMaxLength);
+            entity.Property(product => product.Sku).HasMaxLength(SkuMaxLength);
+            entity.Property(product => product.Description).HasMaxLength(DescriptionMaxLength);
+            entity.Property(product => product.StationCode).HasMaxLength(StationCodeMaxLength);
+            entity.HasIndex(product => new { product.CompanyId, product.Cen }).IsUnique();
+        });
+
+        modelBuilder.Entity<InventoryMovement>(entity =>
+        {
+            entity.Property(movement => movement.Cen).HasMaxLength(CenMaxLength);
+            entity.Property(movement => movement.ExternalReference).HasMaxLength(ExternalReferenceMaxLength);
+            entity.HasIndex(movement => movement.Cen).IsUnique();
+        });
+
+        modelBuilder.Entity<Transaction>(entity =>
+        {
+            entity.Property(transaction => transaction.Cen).HasMaxLength(CenMaxLength);
+            entity.HasIndex(transaction => transaction.Cen).IsUnique();
+        });
 
         modelBuilder.HasDefaultSchema(Schema.Inventory);
         base.OnModelCreating(modelBuilder);

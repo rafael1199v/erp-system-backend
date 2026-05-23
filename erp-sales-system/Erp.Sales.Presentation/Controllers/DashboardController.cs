@@ -5,6 +5,7 @@ namespace Erp.Sales.Presentation.Controllers;
 
 [ApiController]
 [Route("api/sales/dashboard")]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class DashboardController(
     IGetDailySalesDashboardUseCase getDailySalesDashboardUseCase,
     IGetTopProductsDashboardUseCase getTopProductsDashboardUseCase,

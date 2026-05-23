@@ -1,4 +1,5 @@
 using Erp.Sales.Application.Interfaces;
+using Erp.Sales.Application.Services;
 using Erp.Sales.Domain.Entities;
 using Erp.Sales.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,27 @@ public class PaymentTypeRepository(SalesDbContext salesDbContext) : IPaymentType
             .AnyAsync(pt => pt.Id == paymentTypeId && !pt.IsDeleted);
     }
 
+    public async Task<int?> ResolveIdByCodeAsync(string paymentMethodCode)
+    {
+        string normalizedCode = PaymentMethodCodeNormalizer.Normalize(paymentMethodCode);
+        if (int.TryParse(normalizedCode, out int paymentTypeId)
+            && await ExistsAsync(paymentTypeId))
+        {
+            return paymentTypeId;
+        }
+
+        var paymentTypes = await salesDbContext.PaymentTypes
+            .AsNoTracking()
+            .Where(pt => !pt.IsDeleted)
+            .Select(pt => new { pt.Id, pt.Name })
+            .ToListAsync();
+
+        return paymentTypes
+            .Where(paymentType => PaymentMethodCodeNormalizer.Normalize(paymentType.Name) == normalizedCode)
+            .Select(paymentType => (int?)paymentType.Id)
+            .FirstOrDefault();
+    }
+
     public async Task<List<PaymentTypeOption>> GetAllAsync()
     {
         return await Queryable
@@ -25,4 +47,5 @@ public class PaymentTypeRepository(SalesDbContext salesDbContext) : IPaymentType
             })
             .ToListAsync();
     }
+
 }

@@ -7,6 +7,7 @@ namespace Erp.Inventory.Presentation.Controllers;
 
 [Route("api/inventory/[controller]")]
 [ApiController]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class MovementController : ControllerBase
 {
     private readonly ICreateAdjustmentMovementUseCase _createAdjustmentMovementUseCase;

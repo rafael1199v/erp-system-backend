@@ -49,4 +49,52 @@ public class PdfService : IPdfService
 
         return pdf;
     }
+
+    public byte[] GenerateTicketContractPdf(TicketPrintDto ticket)
+    {
+        var pdf = Document.Create(container =>
+        {
+            container.Page(page =>
+            {
+                page.Size(PageSizes.A6);
+                page.Margin(1, Unit.Centimetre);
+                page.Content().Column(col =>
+                {
+                    col.Item().Text($"Ticket #{ticket.DailyNumber}")
+                        .FontSize(18).Bold().AlignCenter();
+
+                    col.Item().Text(ticket.TicketCen)
+                        .FontSize(8).AlignCenter();
+
+                    col.Item().Text(ticket.CreatedAt.ToString("yyyy-MM-dd HH:mm"))
+                        .FontSize(8).AlignCenter();
+
+                    col.Item().Text("REIMPRESION")
+                        .FontSize(10).AlignCenter();
+
+                    col.Item().LineHorizontal(1);
+
+                    foreach (var item in ticket.Items)
+                    {
+                        col.Item().Row(row =>
+                        {
+                            row.RelativeItem().Text($"{item.Quantity}x {item.ProductName}");
+                            row.AutoItem().Text($"Bs. {item.UnitPrice * item.Quantity:F2}");
+                        });
+
+                        if (!string.IsNullOrWhiteSpace(item.Note))
+                        {
+                            col.Item().Text(item.Note).FontSize(9);
+                        }
+                    }
+
+                    col.Item().LineHorizontal(1);
+                    col.Item().Text("Fin de la orden")
+                        .FontSize(9).AlignCenter();
+                });
+            });
+        }).GeneratePdf();
+
+        return pdf;
+    }
 }

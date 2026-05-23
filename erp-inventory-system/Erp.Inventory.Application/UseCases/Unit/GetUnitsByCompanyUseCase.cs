@@ -8,6 +8,11 @@ public class GetUnitsByCompanyUseCase(IUnitRepository unitRepository) : IGetUnit
     public async Task<List<UnitDto>> ExecuteAsync(int companyId)
     {
         var unitEntities = await unitRepository.GetAllByCompanyIdAsync(companyId);
-        return unitEntities.Select(u => new UnitDto(Id: u.Id, Name: u.Name, CompanyId: u.CompanyId)).ToList();
+        return unitEntities.Select(u => new UnitDto(
+            Id: u.Id,
+            Name: u.Name,
+            CompanyId: u.CompanyId,
+            Cen: u.Cen,
+            Abbreviation: u.Abbreviation)).ToList();
     }
 }

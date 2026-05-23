@@ -13,6 +13,7 @@ public class InventoryMovementMapper : IInventoryMovementMapper
         {
             Id = 0,
             Title = createInventoryMovementDTO.Title,
+            ExternalReference = createInventoryMovementDTO.ExternalReference,
             CompanyId = createInventoryMovementDTO.CompanyId,
             MovementDate = DateOnly.ParseExact(createInventoryMovementDTO.MovementDate, "yyyy-MM-dd",
                 CultureInfo.InvariantCulture),
@@ -37,19 +38,26 @@ public class InventoryMovementMapper : IInventoryMovementMapper
         return new InventoryMovementDTO
         {
             Id = inventoryMovementEntity.Id,
+            Cen = inventoryMovementEntity.Cen,
             Title = inventoryMovementEntity.Title,
+            ExternalReference = inventoryMovementEntity.ExternalReference,
             MovementDate = inventoryMovementEntity.MovementDate.ToString(),
             MovementStatus = (int)inventoryMovementEntity.MovementStatus,
             MovementType = (int)inventoryMovementEntity.MovementType,
             Transactions = inventoryMovementEntity.Transactions.Select(t => new TransactionDTO
             {
                 Id = t.Id,
+                Cen = t.Cen,
                 Quantity = t.Quantity,
                 Reason = t.Reason,
                 TransactionDate = t.TransactionDate.ToString(),
                 TransactionType = (int)t.TransactionType,
                 ProductId = t.ProductId,
-                WarehouseId = t.WarehouseId
+                ProductCen = t.Product?.Cen ?? string.Empty,
+                ProductName = t.Product?.ProductName ?? string.Empty,
+                WarehouseId = t.WarehouseId,
+                WarehouseCen = t.Warehouse?.Cen ?? string.Empty,
+                WarehouseName = t.Warehouse?.Name ?? string.Empty
             }).ToList()
         };
     }

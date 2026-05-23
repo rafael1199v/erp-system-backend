@@ -9,7 +9,7 @@ namespace Erp.Sales.Infrastructure.Repositories;
 
 public class PaymentProcessRepository(SalesDbContext salesDbContext) : IPaymentProcessRepository
 {
-    public async Task<int> CreateSaleAndCloseOrderAsync(int restaurantOrderId, Sale sale)
+    public async Task<SalesCenLookup> CreateSaleAndCloseOrderAsync(int restaurantOrderId, Sale sale)
     {
         await using var transaction = await salesDbContext.Database.BeginTransactionAsync();
 
@@ -22,6 +22,7 @@ public class PaymentProcessRepository(SalesDbContext salesDbContext) : IPaymentP
 
             var saleModel = new SaleModel
             {
+                Cen = string.IsNullOrWhiteSpace(sale.Cen) ? Guid.NewGuid().ToString() : sale.Cen,
                 SubtotalPrice = sale.SubtotalPrice,
                 TaxPrice = sale.TaxPrice,
                 DiscountPercentage = sale.DiscountPercentage,
@@ -29,9 +30,11 @@ public class PaymentProcessRepository(SalesDbContext salesDbContext) : IPaymentP
                 CustomerId = sale.CustomerId,
                 PaymentTypeId = sale.PaymentTypeId,
                 CompanyId = sale.CompanyId,
+                CompanyCen = sale.CompanyCen ?? string.Empty,
                 SaleDetails = sale.SaleDetails.Select(detail => new SaleDetailModel
                 {
                     ProductId = detail.ProductId,
+                    ProductCen = detail.ProductCen ?? string.Empty,
                     Price = detail.Price,
                     Quantity = detail.Quantity
                 }).ToList()
@@ -43,7 +46,7 @@ public class PaymentProcessRepository(SalesDbContext salesDbContext) : IPaymentP
             await salesDbContext.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            return saleModel.Id;
+            return new SalesCenLookup(saleModel.Id, saleModel.Cen);
         }
         catch
         {

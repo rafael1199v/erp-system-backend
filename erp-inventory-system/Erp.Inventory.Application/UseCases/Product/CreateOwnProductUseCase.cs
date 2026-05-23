@@ -18,7 +18,10 @@ public class CreateOwnProductUseCase(IProductRepository productRepository) : ICr
             supplierId: productDto.SupplierId,
             currentCost: productDto.CurrentCost,
             reorderLevel: productDto.ReorderLevel,
-            sellPrice: productDto.SellPrice
+            sellPrice: productDto.SellPrice,
+            sku: productDto.Sku,
+            description: productDto.Description,
+            stationCode: productDto.StationCode
         );
 
         var productId = await productRepository.CreateOwnProduct(productCompanyEntity);

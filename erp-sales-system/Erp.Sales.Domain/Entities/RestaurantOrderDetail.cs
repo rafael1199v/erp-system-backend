@@ -5,8 +5,11 @@ namespace Erp.Sales.Domain.Entities;
 public class RestaurantOrderDetail
 {
     public required int Id { get; set; }
+    public string Cen { get; set; } = string.Empty;
     public required int RestaurantOrderId { get; set; }
+    public string TicketCen { get; set; } = string.Empty;
     public required int ProductId { get; set; }
+    public string? ProductCen { get; set; }
     public required OrderDetailStatus Status { get; set; }
     public string? Note { get; set; }
     public required int Quantity { get; set; }
@@ -14,7 +17,12 @@ public class RestaurantOrderDetail
     public DateTime? SentAt { get; set; }
     public required DateTime CreatedAt { get; set; }
 
-    public static RestaurantOrderDetail Create(int restaurantOrderId, int productId, int quantity, string? note)
+    public static RestaurantOrderDetail Create(
+        int restaurantOrderId,
+        int productId,
+        int quantity,
+        string? note,
+        string? productCen = null)
     {
         if (quantity < 1)
         {
@@ -24,8 +32,10 @@ public class RestaurantOrderDetail
         return new RestaurantOrderDetail
         {
             Id = 0,
+            Cen = string.Empty,
             RestaurantOrderId = restaurantOrderId,
             ProductId = productId,
+            ProductCen = productCen,
             Status = OrderDetailStatus.Created,
             Note = note,
             Quantity = quantity,

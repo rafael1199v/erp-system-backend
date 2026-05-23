@@ -79,6 +79,7 @@ public class RestaurantOrderRepository(SalesDbContext salesDbContext) : IRestaur
             var orderModel = new OrderModel
             {
                 CompanyId = restaurantOrder.CompanyId,
+                CompanyCen = restaurantOrder.CompanyCen ?? string.Empty,
                 TaxPrice = restaurantOrder.TaxPrice,
                 CustomerId = restaurantOrder.CustomerId,
                 DailyNumber = maxTicketNumber + 1,
@@ -116,6 +117,7 @@ public class RestaurantOrderRepository(SalesDbContext salesDbContext) : IRestaur
                 or.Order.CompanyId == companyId
                 && or.Order.OrderDatetime >= dayStartUtc
                 && or.Order.OrderDatetime < nextDayStartUtc)
+            .Include(or => or.Waiter)
             .ToListAsync();
         
         return Enumerable.ToList(restaurantOrders.Select(ToDomain));
@@ -138,6 +140,7 @@ public class RestaurantOrderRepository(SalesDbContext salesDbContext) : IRestaur
         return new RestaurantOrderModel
         {
             Id = entity.Id,
+            Cen = string.IsNullOrWhiteSpace(entity.Cen) ? Guid.NewGuid().ToString() : entity.Cen,
             OrderId = entity.OrderId,
             WaiterId = entity.WaiterId,
         };
@@ -149,10 +152,13 @@ public class RestaurantOrderRepository(SalesDbContext salesDbContext) : IRestaur
         return new RestaurantOrder
         {
             Id = model.Id,
+            Cen = model.Cen,
             OrderId = model.Id,
             TaxPrice = model.Order.TaxPrice,
             CompanyId = model.Order.CompanyId,
+            CompanyCen = model.Order.CompanyCen,
             CustomerId = model.Order.CustomerId,
+            WaiterCen = model.Waiter?.Cen,
             WaiterId = model.WaiterId,
             OrderDatetime = model.Order.OrderDatetime,
             Order = new Order

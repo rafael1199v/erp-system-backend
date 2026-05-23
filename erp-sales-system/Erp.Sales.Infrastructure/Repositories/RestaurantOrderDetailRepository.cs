@@ -38,6 +38,25 @@ public class RestaurantOrderDetailRepository(SalesDbContext salesDbContext) : IR
 		return model is null ? null : ToDomain(model);
 	}
 
+	public async Task<RestaurantOrderDetail?> GetByCompanyAndCenAsync(string companyCen, string ticketItemCen)
+	{
+		var normalizedCompanyCen = companyCen.Trim();
+		var normalizedTicketItemCen = ticketItemCen.Trim();
+
+		var model = await salesDbContext.RestaurantOrderDetails
+			.AsNoTracking()
+			.Include(rod => rod.RestaurantOrder)
+			.ThenInclude(restaurantOrder => restaurantOrder.Order)
+			.FirstOrDefaultAsync(rod =>
+				rod.Cen == normalizedTicketItemCen &&
+				!rod.IsDeleted &&
+				!rod.RestaurantOrder.IsDeleted &&
+				!rod.RestaurantOrder.Order.IsDeleted &&
+				rod.RestaurantOrder.Order.CompanyCen == normalizedCompanyCen);
+
+		return model is null ? null : ToDomain(model);
+	}
+
 	public async Task UpdateQuantityAsync(int restaurantOrderDetailId, int quantity, string? note)
 	{
         var model = await Queryable
@@ -85,8 +104,12 @@ public class RestaurantOrderDetailRepository(SalesDbContext salesDbContext) : IR
 		return new RestaurantOrderDetailModel
 		{
 			Id = restaurantOrderDetail.Id,
+			Cen = string.IsNullOrWhiteSpace(restaurantOrderDetail.Cen)
+				? Guid.NewGuid().ToString()
+				: restaurantOrderDetail.Cen,
 			RestaurantOrderId = restaurantOrderDetail.RestaurantOrderId,
 			ProductId = restaurantOrderDetail.ProductId,
+			ProductCen = restaurantOrderDetail.ProductCen ?? string.Empty,
 			RestaurantOrderDetailStatusId = (int)restaurantOrderDetail.Status,
 			Note = restaurantOrderDetail.Note,
 			Quantity = restaurantOrderDetail.Quantity,
@@ -100,8 +123,11 @@ public class RestaurantOrderDetailRepository(SalesDbContext salesDbContext) : IR
 		return new RestaurantOrderDetail
 		{
 			Id = model.Id,
+			Cen = model.Cen,
 			RestaurantOrderId = model.RestaurantOrderId,
+			TicketCen = model.RestaurantOrder?.Cen ?? string.Empty,
 			ProductId = model.ProductId,
+			ProductCen = model.ProductCen,
 			Status = (OrderDetailStatus)model.RestaurantOrderDetailStatusId,
 			Note = model.Note,
 			Quantity = model.Quantity,

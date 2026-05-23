@@ -3,5 +3,8 @@
 **/bin
 **/.idea
 **/bin\\Debug
-**/docs
 schema.sql
+**/*.lscache
+**/erp-system.sln.DotSettings.user
+docs
+**/*.sql

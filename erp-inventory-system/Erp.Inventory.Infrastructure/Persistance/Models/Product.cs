@@ -6,6 +6,18 @@ public class Product
 {
     [Column("id")]
     public int Id { get; set; }
+
+    [Column("cen")]
+    public string Cen { get; set; } = Guid.NewGuid().ToString();
+
+    [Column("sku")]
+    public string? Sku { get; set; }
+
+    [Column("description")]
+    public string? Description { get; set; }
+
+    [Column("station_code")]
+    public string? StationCode { get; set; }
     
     [Column("core_product_id")]
     public int CoreProductId { get; set; }
@@ -28,8 +40,8 @@ public class Product
     public ProductStatus ProductStatus { get; set; } = null!;
     
     [Column("supplier_id")]
-    public int SupplierId { get; set; }
-    public Supplier Supplier { get; set; } = null!;
+    public int? SupplierId { get; set; }
+    public Supplier? Supplier { get; set; }
 
     [Column("current_cost",TypeName = "decimal(12, 2)")]
     public decimal CurrentCost { get; set; } = 0.00m;

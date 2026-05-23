@@ -51,6 +51,7 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
                 throw new Exception("La categoria no existe");
 
             categoryModel.Name = categoryEntity.Name;
+            categoryModel.Description = categoryEntity.Description;
             await context.SaveChangesAsync();
         }
         catch
@@ -65,7 +66,9 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
         return new Category
         {
             Id = categoryEntity.Id,
+            Cen = string.IsNullOrWhiteSpace(categoryEntity.Cen) ? Guid.NewGuid().ToString() : categoryEntity.Cen,
             Name = categoryEntity.Name,
+            Description = categoryEntity.Description,
             CompanyId = categoryEntity.CompanyId 
         };
         
@@ -76,7 +79,9 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
         return new CategoryEntity
         {
             Id = category.Id,
+            Cen = category.Cen,
             Name = category.Name,
+            Description = category.Description,
             CompanyId = category.CompanyId
         };
     }

@@ -10,6 +10,7 @@ public class WarehouseMapper : IWarehouseMapper
         return new WarehouseDTO
         {
             Id = warehouseEntity.Id,
+            Cen = warehouseEntity.Cen,
             Name = warehouseEntity.Name
         };
     }

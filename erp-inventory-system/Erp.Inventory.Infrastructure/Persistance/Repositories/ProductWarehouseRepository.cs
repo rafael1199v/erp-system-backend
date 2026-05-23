@@ -81,7 +81,10 @@ public class ProductWarehouseRepository : IProductWarehouseRepository
         return new ProductWarehouseStockEntity
         {
             ProductId = productWarehouseModel.ProductId,
+            ProductCen = productWarehouseModel.Product.Cen,
+            Sku = productWarehouseModel.Product.Sku,
             WarehouseId = productWarehouseModel.WarehouseId,
+            WarehouseCen = productWarehouseModel.Warehouse.Cen,
             Stock = productWarehouseModel.Quantity,
             ProductName = productWarehouseModel.Product.CoreProduct.Name,
             WarehouseName = productWarehouseModel.Warehouse.Name

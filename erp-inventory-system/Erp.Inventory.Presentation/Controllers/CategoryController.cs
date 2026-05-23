@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Erp.Inventory.Presentation.Controllers;
 
 [ApiController]
+[ApiExplorerSettings(IgnoreApi = true)]
 [Route("api/inventory/[controller]")]
 public class CategoryController(ICreateCategoryUseCase createCategoryUseCase,
     IGetCategoriesByCompanyUseCase getCategoriesByCompanyUseCase,

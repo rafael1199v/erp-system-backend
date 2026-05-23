@@ -8,8 +8,14 @@ public class InventoryMovement
     [Column("id")]
     public int Id { get; set; }
 
+    [Column("cen")]
+    public string Cen { get; set; } = Guid.NewGuid().ToString();
+
     [Required, Column("title"), MaxLength(100)]
     public string Title { get; set; } = string.Empty;
+
+    [Column("external_reference")]
+    public string? ExternalReference { get; set; }
     
     [Column("movement_date")]
     public DateOnly MovementDate { get; set; }

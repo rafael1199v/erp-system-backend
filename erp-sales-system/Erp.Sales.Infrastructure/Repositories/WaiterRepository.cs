@@ -20,8 +20,10 @@ public class WaiterRepository(SalesDbContext salesDbContext) : IWaiterRepository
         return new Waiter
         {
             Id = model.Id,
+            Cen = model.Cen,
             Name = model.Name,
-            CompanyId = model.CompanyId
+            CompanyId = model.CompanyId,
+            CompanyCen = model.CompanyCen
         };
     }
 }

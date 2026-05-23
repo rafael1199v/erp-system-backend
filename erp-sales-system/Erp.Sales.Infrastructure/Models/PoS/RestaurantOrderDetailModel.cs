@@ -7,11 +7,13 @@ namespace Erp.Sales.Infrastructure.Models.PoS;
 public class RestaurantOrderDetailModel
 {
     public int Id { get; set; }
+    public string Cen { get; set; } = Guid.NewGuid().ToString();
     
     public int RestaurantOrderId { get; set; }
     public RestaurantOrderModel RestaurantOrder { get; set; } = null!;
     
     public int ProductId { get; set; }
+    public string ProductCen { get; set; } = string.Empty;
     
     public int RestaurantOrderDetailStatusId { get; set; }
     public RestaurantOrderDetailStatusModel RestaurantOrderDetailStatus { get; set; } = null!;

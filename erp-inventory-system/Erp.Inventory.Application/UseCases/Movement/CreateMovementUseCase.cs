@@ -29,7 +29,7 @@ public class CreateMovementUseCase : ICreateMovementUseCase
         _productRepository = productRepository;
     }
 
-    public async Task ExecuteAsync(CreateInventoryMovementDTO createInventoryMovementDto)
+    public async Task<InventoryMovementDTO> ExecuteAsync(CreateInventoryMovementDTO createInventoryMovementDto)
     {
         InventoryMovementEntity inventoryMovementEntity = this._inventoryMapper.CreateInventoryMovementDtoToEntity(createInventoryMovementDto);
 
@@ -55,7 +55,8 @@ public class CreateMovementUseCase : ICreateMovementUseCase
 
         await this._updateStockUseCase.ExecuteAsync(inventoryMovementEntity.Transactions);
 
-        await this._inventoryMovementRepository.CreateMovementAsync(inventoryMovementEntity);
+        InventoryMovementEntity createdMovement = await this._inventoryMovementRepository.CreateMovementAsync(inventoryMovementEntity);
+        return _inventoryMapper.InventoryMovementEntityToDto(createdMovement);
 
     }
 }

@@ -6,9 +6,12 @@ public record CreateProductDto(
     int UnitId,
     int CompanyId,
     int ProductStatusId,
-    int SupplierId,
+    int? SupplierId,
     int CategoryId,
     decimal CurrentCost,
     int ReorderLevel,
-    decimal SellPrice
+    decimal SellPrice,
+    string? Sku = null,
+    string? Description = null,
+    string? StationCode = null
 );

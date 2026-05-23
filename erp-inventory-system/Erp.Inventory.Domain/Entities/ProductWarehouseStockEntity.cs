@@ -3,7 +3,10 @@ namespace Erp.Inventory.Domain.Entities;
 public class ProductWarehouseStockEntity
 {
     public required int ProductId { get; set; }
+    public string ProductCen { get; set; } = string.Empty;
+    public string? Sku { get; set; }
     public required int WarehouseId { get; set; }
+    public string WarehouseCen { get; set; } = string.Empty;
     public int Stock { get; set; }
     
     public String ProductName { get; set; } = string.Empty;

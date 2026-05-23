@@ -6,6 +6,7 @@ namespace Erp.Sales.Presentation.Controllers;
 
 [ApiController]
 [Route("api/sales/[controller]")]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class PaymentController(
     IGetPaymentTypesUseCase getPaymentTypesUseCase,
     IProcessRestaurantOrderPaymentUseCase processRestaurantOrderPaymentUseCase) : ControllerBase
@@ -34,7 +35,12 @@ public class PaymentController(
                 return BadRequest(result);
             }
 
-            return Ok(new { saleId = result.SaleId });
+            return Ok(new
+            {
+                saleId = result.SaleId,
+                saleCen = result.SaleCen,
+                inventoryDocumentCen = result.InventoryDocumentCen
+            });
         }
         catch (Exception ex)
         {

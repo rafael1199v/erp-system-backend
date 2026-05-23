@@ -5,6 +5,7 @@ namespace Erp.Inventory.Domain.Entities;
 public class TransactionEntity
 {
     public required int Id { get; set; }
+    public string Cen { get; set; } = string.Empty;
     public required int Quantity { get; set; }
     public required string Reason { get; set; } = string.Empty;
     public required DateOnly TransactionDate { get; set; }

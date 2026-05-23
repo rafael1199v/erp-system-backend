@@ -8,6 +8,7 @@ namespace Erp.Inventory.Presentation.Controllers;
 
 [Route("api/inventory/[controller]")]
 [ApiController]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class ProductController(IGetProductWithWarehousesUseCase getProductWithWarehousesUseCase,
     ICreateOwnProductUseCase createOwnProductUseCase,
     IUpdateOwnProductUseCase updateOwnProductUseCase,

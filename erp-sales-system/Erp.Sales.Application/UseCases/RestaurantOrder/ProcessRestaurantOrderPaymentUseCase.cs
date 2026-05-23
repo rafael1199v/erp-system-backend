@@ -34,11 +34,9 @@ public class ProcessRestaurantOrderPaymentUseCase(
             throw new InvalidOperationException("El metodo de pago no es valido");
         }
 
-        var warehouseId = await warehouseConfigurationRepository.GetWarehouseIdByCompanyIdAsync(restaurantOrder.CompanyId);
-        if (warehouseId is null)
-        {
-            throw new InvalidOperationException("No hay una bodega principal configurada para la compania");
-        }
+        string? companyCen = Normalize(restaurantOrder.CompanyCen);
+        string? warehouseCen = Normalize(await warehouseConfigurationRepository
+            .GetWarehouseCenByCompanyIdAsync(restaurantOrder.CompanyId));
 
         var orderDetails = await restaurantOrderDetailRepository.GetByRestaurantOrderIdAsync(processRestaurantOrderPaymentDto.RestaurantOrderId);
         var chargeableDetails = orderDetails
@@ -50,61 +48,49 @@ public class ProcessRestaurantOrderPaymentUseCase(
             throw new InvalidOperationException("No existen items cobrables en la orden");
         }
 
-        var stockRequirements = chargeableDetails.Select(detail => new StockRequirementDto
-        {
-            ProductId = detail.ProductId,
-            RequestedQuantity = detail.Quantity,
-            WarehouseId = warehouseId.Value
-        }).ToList();
+        string? inventoryDocumentCen = null;
 
-        var stockValidationResult = await inventoryService.ValidateStockAvailabilityAsync(stockRequirements, restaurantOrder.CompanyId);
-        if (!stockValidationResult.AllAvailable)
+        if (!CanUseCenInventory(companyCen, warehouseCen, chargeableDetails))
         {
-            return ProcessRestaurantOrderPaymentResultDto.StockFailure(
-                stockValidationResult.Insufficiencies
-                    .Select(insufficiency => new StockInsufficiencyResponseDto
-                    {
-                        ProductId = insufficiency.ProductId,
-                        ProductName = insufficiency.ProductName,
-                        RequestedQuantity = insufficiency.RequestedQuantity,
-                        AvailableQuantity = insufficiency.AvailableQuantity
-                    })
-                    .ToList<StockInsufficiencyResponseDto>());
+            throw new InvalidOperationException("No hay datos CEN suficientes para procesar el pago");
         }
 
-        await inventoryService.ExecutePaymentStockDiscountAsync(new CreatePaymentStockDiscountDto
+        var stockValidationResult = await inventoryService.ValidateStockAsync(
+            companyCen!,
+            CreateStockValidationRequest(warehouseCen!, restaurantOrder.Cen, chargeableDetails));
+
+        if (!stockValidationResult.IsValid)
         {
-            RestaurantOrderId = processRestaurantOrderPaymentDto.RestaurantOrderId,
-            CompanyId = restaurantOrder.CompanyId,
-            WarehouseId = warehouseId.Value,
-            PaymentDateUtc = DateTime.UtcNow,
-            Items = chargeableDetails.Select(detail => new PaymentStockDiscountItemDto
-            {
-                ProductId = detail.ProductId,
-                Quantity = detail.Quantity,
-                Reason = $"Pago de orden {processRestaurantOrderPaymentDto.RestaurantOrderId}"
-            }).ToList()
-        });
+            return ProcessRestaurantOrderPaymentResultDto.StockFailure(
+                MapContractInsufficiencies(stockValidationResult.Requirements));
+        }
 
-        var productIds = chargeableDetails
-            .Select(detail => detail.ProductId)
-            .Distinct()
-            .ToList();
+        var stockConsumeResult = await inventoryService.ConsumeStockAsync(
+            companyCen!,
+            CreateStockConsumeRequest(warehouseCen!, restaurantOrder.Cen, chargeableDetails));
 
-        var products = await inventoryService.GetOrderDetailProductsByIdsAsync(productIds);
-        var productPriceById = products.ToDictionary(product => product.ProductId, product => Convert.ToDecimal((double)product.SellPrice));
+        if (!stockConsumeResult.Success)
+        {
+            return ProcessRestaurantOrderPaymentResultDto.StockFailure(
+                MapContractInsufficiencies(stockConsumeResult.Requirements));
+        }
+
+        inventoryDocumentCen = stockConsumeResult.DocumentCen;
+        var productPriceByCen = await GetProductPricesByCenFromContractAsync(companyCen!, chargeableDetails);
 
         var saleDetails = new List<SaleDetail>();
         foreach (var detail in chargeableDetails)
         {
-            if (!productPriceById.TryGetValue(detail.ProductId, out var price))
+            string productCen = detail.ProductCen!;
+            if (!productPriceByCen.TryGetValue(productCen, out var price))
             {
-                throw new InvalidOperationException($"No se pudo obtener el precio del producto {detail.ProductId}");
+                throw new InvalidOperationException($"No se pudo obtener el precio del producto {productCen}");
             }
 
             saleDetails.Add(new SaleDetail
             {
-                ProductId = detail.ProductId,
+                ProductId = 0,
+                ProductCen = detail.ProductCen,
                 Price = price,
                 Quantity = detail.Quantity
             });
@@ -121,11 +107,112 @@ public class ProcessRestaurantOrderPaymentUseCase(
             CustomerId = restaurantOrder.CustomerId,
             PaymentTypeId = processRestaurantOrderPaymentDto.PaymentTypeId,
             CompanyId = restaurantOrder.CompanyId,
+            CompanyCen = restaurantOrder.CompanyCen,
             SaleDetails = saleDetails
         };
 
-        var saleId = await paymentProcessRepository.CreateSaleAndCloseOrderAsync(processRestaurantOrderPaymentDto.RestaurantOrderId, sale);
+        var createdSale = await paymentProcessRepository.CreateSaleAndCloseOrderAsync(
+            processRestaurantOrderPaymentDto.RestaurantOrderId,
+            sale);
 
-        return ProcessRestaurantOrderPaymentResultDto.Success(saleId);
+        return ProcessRestaurantOrderPaymentResultDto.Success(
+            createdSale.Id,
+            createdSale.Cen,
+            subtotalPrice,
+            restaurantOrder.Order.TaxPrice,
+            inventoryDocumentCen);
+    }
+
+    private static StockValidationContractRequest CreateStockValidationRequest(
+        string warehouseCen,
+        string ticketCen,
+        List<RestaurantOrderDetail> chargeableDetails)
+    {
+        return new StockValidationContractRequest
+        {
+            WarehouseCen = warehouseCen,
+            Source = "SALES",
+            ReferenceCen = ticketCen,
+            Items = chargeableDetails.Select(detail => new StockValidationItemContractDto
+            {
+                ProductCen = detail.ProductCen!,
+                Quantity = detail.Quantity
+            }).ToList()
+        };
+    }
+
+    private static StockConsumeContractRequest CreateStockConsumeRequest(
+        string warehouseCen,
+        string ticketCen,
+        List<RestaurantOrderDetail> chargeableDetails)
+    {
+        return new StockConsumeContractRequest
+        {
+            WarehouseCen = warehouseCen,
+            Source = "SALES",
+            ReferenceCen = ticketCen,
+            Reason = $"Pago de ticket {ticketCen}",
+            Items = chargeableDetails.Select(detail => new StockConsumeItemContractDto
+            {
+                ProductCen = detail.ProductCen!,
+                Quantity = detail.Quantity
+            }).ToList()
+        };
+    }
+
+    private async Task<Dictionary<string, decimal>> GetProductPricesByCenFromContractAsync(
+        string companyCen,
+        List<RestaurantOrderDetail> chargeableDetails)
+    {
+        var products = await inventoryService.GetProductsAsync(companyCen);
+        var productsByCen = products.ToDictionary(product => product.ProductCen, StringComparer.OrdinalIgnoreCase);
+        var productPriceByCen = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var detail in chargeableDetails)
+        {
+            if (!productsByCen.TryGetValue(detail.ProductCen!, out var product))
+            {
+                throw new InvalidOperationException($"No se pudo obtener el precio del producto {detail.ProductCen}");
+            }
+
+            productPriceByCen[detail.ProductCen!] = product.SalePrice;
+        }
+
+        return productPriceByCen;
+    }
+
+    private static List<StockInsufficiencyResponseDto> MapContractInsufficiencies(
+        List<StockRequirementContractDto> requirements)
+    {
+        return requirements.Select(requirement => new StockInsufficiencyResponseDto
+        {
+            ProductId = 0,
+            ProductCen = requirement.ProductCen,
+            ProductName = requirement.ProductName,
+            WarehouseCen = requirement.WarehouseCen,
+            RequestedQuantity = ToIntQuantity(requirement.RequestedQuantity),
+            AvailableQuantity = ToIntQuantity(requirement.AvailableQuantity),
+            MissingQuantity = ToIntQuantity(requirement.MissingQuantity)
+        }).ToList();
+    }
+
+    private static bool CanUseCenInventory(
+        string? companyCen,
+        string? warehouseCen,
+        List<RestaurantOrderDetail> chargeableDetails)
+    {
+        return companyCen is not null
+               && warehouseCen is not null
+               && chargeableDetails.All(detail => !string.IsNullOrWhiteSpace(detail.ProductCen));
+    }
+
+    private static int ToIntQuantity(decimal quantity)
+    {
+        return decimal.ToInt32(decimal.Truncate(quantity));
+    }
+
+    private static string? Normalize(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
     }
 }

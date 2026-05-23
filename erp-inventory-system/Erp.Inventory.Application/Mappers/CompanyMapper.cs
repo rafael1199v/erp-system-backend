@@ -10,6 +10,7 @@ public class CompanyMapper : ICompanyMapper
         return new GetCompanyDTO
         {
             Id = companyEntity.Id,
+            Cen = companyEntity.Cen,
             Name = companyEntity.Name
         };
     }

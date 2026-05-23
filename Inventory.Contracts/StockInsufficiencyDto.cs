@@ -4,6 +4,7 @@ public class StockInsufficiencyDto
 {
     public int ProductId { get; set; }
     public string ProductName { get; set; } = string.Empty;
+    public int WarehouseId { get; set; }
     public int RequestedQuantity { get; set; }
     public int AvailableQuantity { get; set; }
 }
