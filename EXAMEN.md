@@ -4,8 +4,8 @@
 
 - **Nombre completo:** Rafael Andres Vargas Mamani
 - **Pareja asignada para el sábado:** Enrique Díaz
-- **Repositorio de Inventario:** [Repositorio de ventas](https://github.com/rafael1199v/erp-system-backend/tree/main/erp-inventory-system)
-- **Repositorio de Ventas:** [Repositorio de inventario](https://github.com/rafael1199v/erp-system-backend/tree/main/erp-sales-system)
+- **Repositorio de Inventario:** [Repositorio de inventario](https://github.com/rafael1199v/erp-system-backend/tree/main/erp-inventory-system)
+- **Repositorio de Ventas:** [Repositorio de ventas](https://github.com/rafael1199v/erp-system-backend/tree/main/erp-sales-system)
 - **Contrato API acordado en grupo:** [Contrato API](https://github.com/rafael1199v/erp-system-backend/blob/main/contrato-api.yaml)
 - **URL del Swagger autogenerado** (cuando levantás el backend localmente): 
     - http://localhost:5143/swagger/index.html
