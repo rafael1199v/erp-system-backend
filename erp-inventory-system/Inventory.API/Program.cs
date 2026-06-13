@@ -35,15 +35,15 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// if (app.Environment.IsDevelopment())
+// {
+app.MapOpenApi();
+app.MapOpenApi("/openapi/{documentName}.yaml");
+app.UseSwaggerUI(options => 
 {
-    app.MapOpenApi();
-    app.MapOpenApi("/openapi/{documentName}.yaml");
-    app.UseSwaggerUI(options => 
-    {
-        options.SwaggerEndpoint("/openapi/v1.json", "Open API V1");
-    });
-}
+    options.SwaggerEndpoint("/openapi/v1.json", "Open API V1");
+});
+//}
 
 app.UseGlobalExceptionHandler();
 
