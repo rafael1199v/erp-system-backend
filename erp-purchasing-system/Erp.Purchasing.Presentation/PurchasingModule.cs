@@ -9,6 +9,8 @@ using Erp.Purchasing.Presentation.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Polly;
+using Polly.Extensions.Http;
 
 namespace Erp.Purchasing.Presentation;
 
@@ -33,11 +35,22 @@ public static class PurchasingModule
         services.AddScoped<ISupplierRepository, SupplierRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+        var inventoryUrl = configuration["INVENTORY_URL"]
+                           ?? configuration["Modules:InventoryBaseUrl"]
+                           ?? throw new InvalidOperationException("INVENTORY_URL not configured");
+
+        services.AddTransient<InventoryFailureTranslatingHandler>();
+
         services.AddHttpClient<IPurchasingInventoryService, PurchasingInventoryHttpClient>(client =>
-        {
-            client.BaseAddress = new Uri(configuration["Modules:InventoryBaseUrl"]
-                                         ?? throw new InvalidOperationException("InventoryBaseUrl not found"));
-        });
+            {
+                client.BaseAddress = new Uri(inventoryUrl);
+                client.Timeout = TimeSpan.FromSeconds(10);
+            })
+            .AddHttpMessageHandler<InventoryFailureTranslatingHandler>()
+            .AddPolicyHandler(HttpPolicyExtensions.HandleTransientHttpError()
+                .WaitAndRetryAsync(3, attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt))))
+            .AddPolicyHandler(HttpPolicyExtensions.HandleTransientHttpError()
+                .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
 
         return services;
     }

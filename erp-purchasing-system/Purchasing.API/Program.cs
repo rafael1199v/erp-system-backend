@@ -1,10 +1,14 @@
 using System.Text.Json.Serialization;
 using Erp.Purchasing.Presentation;
 
+DotNetEnv.Env.TraversePath().Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 const string allowSpecificOrigins = "AllowSpecificOrigins";
+
+var corsOrigins = builder.Configuration["CORS_ORIGINS"]
+    ?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) ?? [];
 
 builder.Services
     .AddControllers()
@@ -23,11 +27,16 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: allowSpecificOrigins,
         policy =>
         {
-            policy
-                .AllowAnyOrigin()
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-            
+            if (corsOrigins.Length > 0)
+            {
+                policy.WithOrigins(corsOrigins);
+            }
+            else
+            {
+                policy.AllowAnyOrigin();
+            }
+
+            policy.AllowAnyHeader().AllowAnyMethod();
         });
 });
 
@@ -46,7 +55,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseGlobalExceptionHandler();
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
+
+app.UseCors(allowSpecificOrigins);
 
 app.UseAuthorization();
 

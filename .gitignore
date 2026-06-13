@@ -8,3 +8,5 @@ schema.sql
 **/erp-system.sln.DotSettings.user
 docs
 **/*.sql
+**/.env
+!**/.env.example

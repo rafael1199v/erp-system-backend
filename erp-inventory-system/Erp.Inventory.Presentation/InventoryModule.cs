@@ -1,5 +1,6 @@
 using Erp.Inventory.Application.Interfaces;
 using Erp.Inventory.Application.Mappers;
+using Erp.Inventory.Application.Realtime;
 using Erp.Inventory.Application.Services;
 using Erp.Inventory.Application.UseCases.Category;
 using Erp.Inventory.Application.UseCases.Company;
@@ -15,6 +16,7 @@ using Erp.Inventory.Contracts;
 using Erp.Inventory.Infrastructure.Persistance.Context;
 using Erp.Inventory.Infrastructure.Persistance.Repositories;
 using Erp.Inventory.Infrastructure.Persistance.Services;
+using Erp.Inventory.Infrastructure.Realtime;
 using Erp.Inventory.Application.ContractAdapters;
 using Erp.Inventory.Presentation.Controllers;
 using Microsoft.EntityFrameworkCore;
@@ -90,7 +92,9 @@ public static class InventoryModule
         services.AddScoped<IInventoryProductContractAdapter, InventoryProductContractAdapter>();
         services.AddScoped<IInventoryStockContractAdapter, InventoryStockContractAdapter>();
         services.AddScoped<IInventoryMovementContractAdapter, InventoryMovementContractAdapter>();
-        
+
+        services.AddSingleton<IRestockNotifier, RestockNotifier>();
+
         return services;
     }
 }

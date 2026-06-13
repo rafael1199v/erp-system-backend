@@ -17,6 +17,8 @@ using Erp.Sales.Presentation.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Polly;
+using Polly.Extensions.Http;
 using QuestPDF.Infrastructure;
 
 namespace Erp.Sales.Presentation;
@@ -88,12 +90,23 @@ public static class SalesModule
         services.AddScoped<ISalesCenResolver, SalesCenResolver>();
         services.AddScoped<ISalesPaymentResolver, SalesPaymentResolver>();
 
+        var inventoryUrl = configuration["INVENTORY_URL"]
+                           ?? configuration["Modules:InventoryBaseUrl"]
+                           ?? throw new InvalidOperationException("INVENTORY_URL not configured");
+
+        services.AddTransient<InventoryFailureTranslatingHandler>();
+
         services.AddHttpClient<IInventoryService, InventoryHttpClient>(client =>
-        {
-            client.BaseAddress = new Uri(configuration["Modules:InventoryBaseUrl"] ??
-                                         throw new Exception("InventoryBaseUrl not found"));
-        });
-        
+            {
+                client.BaseAddress = new Uri(inventoryUrl);
+                client.Timeout = TimeSpan.FromSeconds(10);
+            })
+            .AddHttpMessageHandler<InventoryFailureTranslatingHandler>()
+            .AddPolicyHandler(HttpPolicyExtensions.HandleTransientHttpError()
+                .WaitAndRetryAsync(3, attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt))))
+            .AddPolicyHandler(HttpPolicyExtensions.HandleTransientHttpError()
+                .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+
         return services;
     }
 }

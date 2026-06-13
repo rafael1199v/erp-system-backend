@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Erp.Sales.Application.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 public static class GlobalExceptionHandlerExtensions
@@ -58,6 +59,11 @@ public static class GlobalExceptionHandlerExtensions
     {
         return exception switch
         {
+            InventoryUnavailableException => (
+                StatusCodes.Status503ServiceUnavailable,
+                "Servicio no disponible",
+                GetExceptionMessage(exception, "El modulo de Inventario no esta disponible en este momento.")),
+
             KeyNotFoundException => (
                 StatusCodes.Status404NotFound,
                 "Recurso no encontrado",
