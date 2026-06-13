@@ -1,5 +1,6 @@
 using Erp.Inventory.Application.DTOs;
 using Erp.Inventory.Application.Interfaces;
+using Erp.Inventory.Application.Realtime;
 using Erp.Inventory.Application.UseCases.Movement;
 using Erp.Inventory.Application.UseCases.Product;
 using Erp.Inventory.Contracts;
@@ -12,7 +13,8 @@ public class InventoryStockContractAdapter(
     IInventoryContractMapper mapper,
     IGetProductWithWarehousesUseCase getProductWithWarehousesUseCase,
     IInventoryService inventoryService,
-    ICreateMovementUseCase createMovementUseCase) : IInventoryStockContractAdapter
+    ICreateMovementUseCase createMovementUseCase,
+    IRestockNotifier restockNotifier) : IInventoryStockContractAdapter
 {
     public async Task<InventoryContractResult<List<StockItemContractDto>>> GetStockAsync(
         string companyCen,
@@ -258,6 +260,15 @@ public class InventoryStockContractAdapter(
                     TransactionType = (int)TransactionTypeEnum.In
                 }).ToList()
             });
+
+            await restockNotifier.PublishAsync(new RestockEvent(
+                companyCen,
+                request.WarehouseCen,
+                request.ReferenceCen,
+                DateTime.UtcNow,
+                request.Items
+                    .Select(item => new RestockItem(item.ProductCen, item.Quantity))
+                    .ToList()));
 
             return InventoryContractResult<string>.Ok(movement.Cen);
         }
